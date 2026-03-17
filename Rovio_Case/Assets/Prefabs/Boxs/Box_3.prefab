@@ -127,5 +127,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BoxController
   boxConfig: {fileID: 11400000, guid: babbabc730da6ca4f821c32dff1d9e96, type: 2}
   path: {fileID: 3389060179308432804, guid: 4b124b45e57d2c147b3473bc5237b20b, type: 3}
-  collectCheckInterval: 0.05
-  gridAlignTolerance: 0.25
+  defaultMoveSpeed: 7
