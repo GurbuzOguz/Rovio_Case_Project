@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d287f6abb4f17894ebb5201cc0dda7a5, type: 3}
+  m_Name: LevelConfigInstaller_Level_1
+  m_EditorClassIdentifier: Assembly-CSharp::LevelConfigInstaller
+  gridConfig: {fileID: 11400000, guid: c8d218240196df342b9d0258bb8e417a, type: 2}
+  levelLayout: {fileID: 11400000, guid: a990fa0a196eb5d4398dd7fb79e7872f, type: 2}
