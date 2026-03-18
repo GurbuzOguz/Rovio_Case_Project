@@ -14,7 +14,15 @@ public class LevelLayout : ScriptableObject
     public List<ProductCellData> products = new List<ProductCellData>();
 
     [Header("Bench / Level Settings")]
-    public int benchCapacity = 3;
-    public int initialBoxCount = 3;
+    [Range(0, 10)]
+    public int benchCapacity = 5;
+
+    [Range(0, 9)]
+    public int initialBoxCount = 9;
+
+    [Header("Boxes")]
+    [Tooltip("Level başında hangi BoxConfig'lerin kullanılacağını belirtir. Sıra, sahnedeki spawn point sırasına göre eşlenir.")]
+    public List<BoxConfig> initialBoxConfigs = new List<BoxConfig>();
 }
+
 

@@ -22,12 +22,34 @@ public class BoxController : MonoBehaviour, IBox
     [Header("Movement Override")]
     [SerializeField] private float defaultMoveSpeed = 3f;
 
+    [Header("Visuals")]
+    [SerializeField] private Color defaultBoxColor = Color.white;
+    [SerializeField] private bool playSpawnAnimation = true;
+    [SerializeField] private float spawnScaleDuration = 0.25f;
+    [Tooltip("Scale animasyonu için görsel root. Collider olan root'u scale etmeyin.")]
+    [SerializeField] private Transform visualRoot;
+
+    [Header("Collect (Align)")]
+    [SerializeField] private float alignTolerance = 0.2f;
+    [SerializeField] private float collectInterval = 0.05f;
+    [SerializeField] private float pullMaxDistance = 2.0f;
+    [SerializeField] private bool onlyPullFromCornerZones = true;
+    [SerializeField] private float cornerOutsideMargin = 0.15f;
+
     private IGridService _gridService;
+    private LevelLayout _levelLayout;
+    private ProductPalette _paletteOverride;
+    private IBenchService _benchService;
+    private Transform _reservedBenchSlot;
+    private IProductViewService _productViewService;
+
+    private Vector3 _initialScale;
 
     private int _currentLoad;
     private int _pathIndex;
     private Coroutine _moveRoutine;
     private BoxState _state = BoxState.Idle;
+    private float _collectTimer;
 
     // Tek bir instance üzerinden tıklama raycast'ini yönetmek için
     private static BoxController _clickHandlerInstance;
@@ -39,22 +61,85 @@ public class BoxController : MonoBehaviour, IBox
     public bool IsFull => _currentLoad >= Capacity && Capacity > 0;
     public float MoveSpeed => boxConfig != null ? boxConfig.moveSpeed : defaultMoveSpeed;
 
+    public void Initialize(BoxConfig config, BoxPath sharedPath, ProductPalette paletteOverride = null)
+    {
+        boxConfig = config;
+        path = sharedPath != null ? sharedPath : path;
+        _paletteOverride = paletteOverride;
+
+        ApplyColorFromPalette();
+    }
+
     [Inject]
-    public void Construct(IGridService gridService)
+    public void Construct(
+        IGridService gridService,
+        LevelLayout levelLayout,
+        [InjectOptional] IBenchService benchService,
+        [InjectOptional] IProductViewService productViewService)
     {
         _gridService = gridService;
+        _levelLayout = levelLayout;
+        _benchService = benchService;
+        _productViewService = productViewService;
+    }
+
+    private void ApplyColorFromPalette()
+    {
+        var renderer = GetComponentInChildren<Renderer>();
+        if (renderer == null)
+        {
+            return;
+        }
+
+        int colorId = boxConfig != null ? boxConfig.colorId : -1;
+        Color color = defaultBoxColor;
+
+        ProductPalette palette = _paletteOverride != null
+            ? _paletteOverride
+            : (_levelLayout != null ? _levelLayout.productPalette : null);
+
+        if (palette != null && palette.entries != null)
+        {
+            for (int i = 0; i < palette.entries.Count; i++)
+            {
+                if (palette.entries[i].colorId == colorId)
+                {
+                    color = palette.entries[i].displayColor;
+                    break;
+                }
+            }
+        }
+
+        var mpb = new MaterialPropertyBlock();
+        renderer.GetPropertyBlock(mpb);
+
+#if UNITY_2021_2_OR_NEWER
+        if (renderer.sharedMaterial != null && renderer.sharedMaterial.HasProperty("_BaseColor"))
+        {
+            mpb.SetColor("_BaseColor", color);
+        }
+        else
+#endif
+        if (renderer.sharedMaterial != null && renderer.sharedMaterial.HasProperty("_Color"))
+        {
+            mpb.SetColor("_Color", color);
+        }
+
+        renderer.SetPropertyBlock(mpb);
     }
 
     private void Awake()
     {
+        if (visualRoot == null)
+        {
+            visualRoot = transform;
+        }
+
+        _initialScale = visualRoot.localScale;
+
         if (boxConfig == null)
         {
             Debug.LogWarning($"BoxController on {name}: BoxConfig not assigned.");
-        }
-
-        if (path == null)
-        {
-            path = GetComponent<BoxPath>();
         }
 
         // İlk BoxController instance'ını global click handler olarak kullan
@@ -64,15 +149,41 @@ public class BoxController : MonoBehaviour, IBox
         }
     }
 
+    private void OnEnable()
+    {
+#if DOTWEEN_EXISTS || true
+        if (playSpawnAnimation)
+        {
+            PlaySpawnAnimation();
+        }
+#endif
+    }
+
+#if DOTWEEN_EXISTS || true
+    private void PlaySpawnAnimation()
+    {
+        if (visualRoot == null)
+        {
+            return;
+        }
+
+        visualRoot.DOKill(false);
+        visualRoot.localScale = Vector3.zero;
+        visualRoot.DOScale(_initialScale, spawnScaleDuration).SetEase(Ease.OutBack);
+    }
+#endif
+
     private void OnDestroy()
     {
         if (_clickHandlerInstance == this)
         {
             _clickHandlerInstance = null;
         }
+
+        ReleaseBenchSlotIfAny();
     }
 
-        private void Update()
+    private void Update()
     {
         // Sadece tek bir instance input'u dinlesin
         if (_clickHandlerInstance != this)
@@ -115,15 +226,16 @@ public class BoxController : MonoBehaviour, IBox
     {
         if (_state == BoxState.Idle || _state == BoxState.OnBench)
         {
+            ReleaseBenchSlotIfAny();
             StartMove();
         }
     }
 
     public void StartMove()
     {
-        if (path == null || path.LocalWaypoints.Count == 0)
+        if (path == null || path.LocalWaypoints == null || path.LocalWaypoints.Count == 0)
         {
-            Debug.LogWarning($"BoxController on {name}: Path is missing or empty.");
+            Debug.LogWarning($"BoxController on {name}: Shared BoxPath is missing or empty.");
             return;
         }
 
@@ -139,13 +251,11 @@ public class BoxController : MonoBehaviour, IBox
     {
         _state = BoxState.Moving;
         _pathIndex = 0;
-
-        var waypoints = path.LocalWaypoints;
-        var origin = path.transform.position;
-
-        Vector3 startPos = transform.position;
+        _collectTimer = 0f;
 
         float speed = MoveSpeed;
+        var waypoints = path.LocalWaypoints;
+        var origin = path.transform.position;
 
         while (_pathIndex < waypoints.Count)
         {
@@ -157,7 +267,7 @@ public class BoxController : MonoBehaviour, IBox
             Tween moveTween = transform
                 .DOMove(targetPos, segmentDuration)
                 .SetEase(Ease.Linear)
-                .OnUpdate(TryCollectProductAtCurrentPosition);
+                .OnUpdate(TryCollectAlignedProductIfAny);
 
             yield return moveTween.WaitForCompletion();
 #else
@@ -167,7 +277,7 @@ public class BoxController : MonoBehaviour, IBox
                 elapsed += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsed / segmentDuration);
                 transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
-                TryCollectProductAtCurrentPosition();
+                TryCollectAlignedProductIfAny();
                 yield return null;
             }
 #endif
@@ -178,42 +288,54 @@ public class BoxController : MonoBehaviour, IBox
         OnPathCompleted();
     }
 
-    private void TryCollectProductAtCurrentPosition()
+    private void TryCollectAlignedProductIfAny()
     {
         if (_gridService == null || boxConfig == null)
         {
             return;
         }
 
-        Vector3 pos = transform.position;
-        Vector2Int gridPos = _gridService.WorldToGrid(pos);
-
-        if (!_gridService.IsInside(gridPos.x, gridPos.y))
+        _collectTimer += Time.deltaTime;
+        if (_collectTimer < collectInterval)
         {
             return;
         }
-
-        if (!_gridService.HasProductAt(gridPos.x, gridPos.y))
-        {
-            return;
-        }
-
-        int productColorId = _gridService.GetProductAt(gridPos.x, gridPos.y);
-
-        if (productColorId != boxConfig.colorId)
-        {
-            return;
-        }
+        _collectTimer = 0f;
 
         if (IsFull)
         {
             return;
         }
 
-        _gridService.RemoveProductAt(gridPos.x, gridPos.y);
-        _currentLoad++;
+        Vector3 pos = transform.position;
+        if (onlyPullFromCornerZones && !IsInCornerPullZone(pos))
+        {
+            return;
+        }
 
-        // TODO: product view'i yok etmek için event veya ayrı bir sistem ekleyeceğiz.
+        if (!_gridService.TryFindAlignedProductCell(pos, alignTolerance, boxConfig.colorId, out var cell))
+        {
+            return;
+        }
+
+        // Ürün çok uzaktaysa çekme
+        Vector3 cellWorld = _gridService.GridToWorld(cell.x, cell.y);
+        float dist = Vector2.Distance(new Vector2(pos.x, pos.z), new Vector2(cellWorld.x, cellWorld.z));
+        if (dist > pullMaxDistance)
+        {
+            return;
+        }
+
+        if (_productViewService == null)
+        {
+            Debug.LogWarning("BoxController: IProductViewService not injected. Only grid data will be removed (no pull animation).");
+        }
+
+        // Önce view tarafını tüket (varsa) ve box'a çek
+        _productViewService?.TryConsumeAndPullToBox(cell, transform);
+
+        _gridService.RemoveProductAt(cell.x, cell.y);
+        _currentLoad++;
 
         if (IsFull)
         {
@@ -221,9 +343,30 @@ public class BoxController : MonoBehaviour, IBox
         }
     }
 
+    private bool IsInCornerPullZone(Vector3 worldPos)
+    {
+        if (_levelLayout == null || _levelLayout.gridConfig == null)
+        {
+            return true;
+        }
+
+        var gc = _levelLayout.gridConfig;
+        float minX = gc.origin.x;
+        float maxX = gc.origin.x + (gc.columns - 1) * gc.cellSize;
+        float minZ = gc.origin.z;
+        float maxZ = gc.origin.z + (gc.rows - 1) * gc.cellSize;
+
+        bool xOutside = worldPos.x < (minX - cornerOutsideMargin) || worldPos.x > (maxX + cornerOutsideMargin);
+        bool zOutside = worldPos.z < (minZ - cornerOutsideMargin) || worldPos.z > (maxZ + cornerOutsideMargin);
+
+        // Köşe bölgeleri: hem X hem Z grid bounds'un dışında olmalı
+        return xOutside && zOutside;
+    }
+
     private void OnBoxFull()
     {
         _state = BoxState.Destroyed;
+        ReleaseBenchSlotIfAny();
 #if DOTWEEN_EXISTS || true
         transform
             .DOScale(Vector3.zero, 0.25f)
@@ -234,6 +377,21 @@ public class BoxController : MonoBehaviour, IBox
 #endif
     }
 
+    private void ReleaseBenchSlotIfAny()
+    {
+        if (_reservedBenchSlot == null)
+        {
+            return;
+        }
+
+        if (_benchService != null)
+        {
+            _benchService.ReleaseSlot(_reservedBenchSlot);
+        }
+
+        _reservedBenchSlot = null;
+    }
+
     private void OnPathCompleted()
     {
         if (IsFull)
@@ -242,11 +400,28 @@ public class BoxController : MonoBehaviour, IBox
             return;
         }
 
-        // Şimdilik bench'e oturduğunu varsayıp state'i güncelliyoruz.
-        _state = BoxState.OnBench;
-        Debug.Log($"Box {name} reached bench (placeholder).");
+        // Bench'e oturma
+        if (_benchService == null)
+        {
+            Debug.LogWarning($"Box {name}: IBenchService not injected. Staying at end of path.");
+            _state = BoxState.OnBench;
+            return;
+        }
 
-        // Sonraki adımda burada Bench sistemi ile entegre olacağız.
+        if (!_benchService.TryReserveSlot(out _reservedBenchSlot) || _reservedBenchSlot == null)
+        {
+            Debug.LogError("BENCH FULL -> Level Fail (placeholder)");
+            _state = BoxState.OnBench;
+            return;
+        }
+
+        _state = BoxState.OnBench;
+
+#if DOTWEEN_EXISTS || true
+        transform.DOMove(_reservedBenchSlot.position, 0.25f).SetEase(Ease.OutQuad);
+#else
+        transform.position = _reservedBenchSlot.position;
+#endif
     }
 }
 

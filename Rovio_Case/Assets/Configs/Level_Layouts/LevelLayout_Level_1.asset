@@ -14,6 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelLayout
   gridConfig: {fileID: 11400000, guid: c8d218240196df342b9d0258bb8e417a, type: 2}
   productPalette: {fileID: 11400000, guid: 73517239225195d4dad18354de83563d, type: 2}
-  products: []
+  products:
+  - x: 1
+    y: 0
+    colorId: 0
+  - x: 2
+    y: 0
+    colorId: 0
+  - x: 3
+    y: 0
+    colorId: 0
+  - x: 4
+    y: 0
+    colorId: 0
+  - x: 5
+    y: 0
+    colorId: 0
   benchCapacity: 5
   initialBoxCount: 9
+  initialBoxConfigs:
+  - {fileID: 11400000, guid: 9367bc08e6f490f4d8b2e923ae21bc5c, type: 2}

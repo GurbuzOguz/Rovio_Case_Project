@@ -109,5 +109,85 @@ public class GridService : IGridService
     {
         return _products.Count == 0;
     }
+
+    public bool TryFindAlignedProductCell(Vector3 worldPosition, float alignTolerance, int colorId, out Vector2Int cell)
+    {
+        cell = default;
+
+        if (_products.Count == 0)
+        {
+            return false;
+        }
+
+        var origin = _gridConfig.origin;
+        var size = _gridConfig.cellSize;
+
+        // Grid üzerindeki hücre merkezleri:
+        // xCenter = origin.x + x*size
+        // zCenter = origin.z + y*size
+        float localX = worldPosition.x - origin.x;
+        float localZ = worldPosition.z - origin.z;
+
+        int alignedColumn = Mathf.RoundToInt(localX / size);
+        int alignedRow = Mathf.RoundToInt(localZ / size);
+
+        bool columnAligned = Mathf.Abs(worldPosition.x - (origin.x + alignedColumn * size)) <= alignTolerance;
+        bool rowAligned = Mathf.Abs(worldPosition.z - (origin.z + alignedRow * size)) <= alignTolerance;
+
+        if (!columnAligned && !rowAligned)
+        {
+            return false;
+        }
+
+        float bestDistSqr = float.PositiveInfinity;
+        Vector2Int bestCell = default;
+        bool found = false;
+
+        // Aynı renk için, hizalı sütun/satır üzerindeki productları tara.
+        foreach (var kvp in _products)
+        {
+            if (kvp.Value != colorId)
+            {
+                continue;
+            }
+
+            var c = kvp.Key;
+            if (columnAligned && c.x != alignedColumn)
+            {
+                // sütun hizalıysa sadece o sütun
+                continue;
+            }
+
+            if (rowAligned && !columnAligned && c.y != alignedRow)
+            {
+                // satır hizalıysa (ve sütun hizalı değilse) sadece o satır
+                continue;
+            }
+
+            // Eğer hem satır hem sütun hizalıysa, iki eksenden birine uyanları kabul ediyoruz:
+            if (rowAligned && columnAligned && c.x != alignedColumn && c.y != alignedRow)
+            {
+                continue;
+            }
+
+            Vector3 cellWorld = GridToWorld(c.x, c.y);
+            float distSqr = (new Vector2(worldPosition.x, worldPosition.z) - new Vector2(cellWorld.x, cellWorld.z)).sqrMagnitude;
+
+            if (distSqr < bestDistSqr)
+            {
+                bestDistSqr = distSqr;
+                bestCell = c;
+                found = true;
+            }
+        }
+
+        if (!found)
+        {
+            return false;
+        }
+
+        cell = bestCell;
+        return true;
+    }
 }
 

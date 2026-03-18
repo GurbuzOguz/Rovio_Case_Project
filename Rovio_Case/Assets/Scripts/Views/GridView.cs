@@ -23,6 +23,7 @@ public class GridView : MonoBehaviour
 
     private IGridService _gridService;
     private LevelLayout _levelLayout;
+    private IProductViewService _productViewService;
 
     // colorId -> display color
     private readonly Dictionary<int, Color> _productColors =
@@ -32,10 +33,11 @@ public class GridView : MonoBehaviour
     private Vector3 _productInitialScale = Vector3.one;
 
     [Inject]
-    public void Construct(IGridService gridService, LevelLayout levelLayout)
+    public void Construct(IGridService gridService, LevelLayout levelLayout, [InjectOptional] IProductViewService productViewService)
     {
         _gridService = gridService;
         _levelLayout = levelLayout;
+        _productViewService = productViewService;
     }
 
     private void Awake()
@@ -81,6 +83,11 @@ public class GridView : MonoBehaviour
         {
             Debug.LogError("GridView: IGridService is not injected.");
             return;
+        }
+
+        if (_productViewService == null)
+        {
+            Debug.LogWarning("GridView: IProductViewService not injected. Products won't animate when collected.");
         }
 
         EnsureParents();
@@ -174,6 +181,18 @@ public class GridView : MonoBehaviour
                 var worldPos = _gridService.GridToWorld(x, y) + Vector3.up * productHeightOffset;
                 var product = Instantiate(productPrefab, worldPos, Quaternion.identity, productsParent);
                 product.name = $"Product_{colorId}_{x}_{y}";
+
+                var pv = product.GetComponent<ProductView>();
+                if (pv == null)
+                {
+                    pv = product.AddComponent<ProductView>();
+                }
+                pv.Initialize(new Vector2Int(x, y), colorId);
+                _productViewService?.Register(new Vector2Int(x, y), pv);
+                if (_productViewService == null)
+                {
+                    // Register edemiyoruz, box pull animasyonu çalışmayacak
+                }
 
                 var renderer = product.GetComponentInChildren<Renderer>();
                 if (renderer == null)
