@@ -4,13 +4,39 @@ using Zenject;
 [CreateAssetMenu(fileName = "LevelConfigInstaller", menuName = "Installers/Level Config Installer")]
 public class LevelConfigInstaller : ScriptableObjectInstaller<LevelConfigInstaller>
 {
+    [Header("Single Level (legacy)")]
     public GridConfig gridConfig;
     public LevelLayout levelLayout;
 
+    [Header("Optional Sequence Override")]
+    public LevelSequenceConfig levelSequence;
+
     public override void InstallBindings()
     {
-        Container.Bind<GridConfig>().FromInstance(gridConfig).AsSingle();
-        Container.Bind<LevelLayout>().FromInstance(levelLayout).AsSingle();
+        LevelLayout chosenLayout = levelLayout;
+
+        if (levelSequence != null && levelSequence.levels != null && levelSequence.levels.Count > 0)
+        {
+            int idx = Mathf.Max(0, PlayerPrefs.GetInt(LevelPrefsKeys.CurrentLevelIndex, 0));
+            idx = Mathf.Clamp(idx, 0, levelSequence.levels.Count - 1);
+            chosenLayout = levelSequence.levels[idx];
+        }
+
+        if (chosenLayout == null)
+        {
+            Debug.LogError("LevelConfigInstaller: No LevelLayout assigned/found.");
+            chosenLayout = ScriptableObject.CreateInstance<LevelLayout>();
+        }
+
+        GridConfig chosenGrid = chosenLayout.gridConfig != null ? chosenLayout.gridConfig : gridConfig;
+        if (chosenGrid == null)
+        {
+            Debug.LogError("LevelConfigInstaller: No GridConfig assigned/found.");
+            chosenGrid = ScriptableObject.CreateInstance<GridConfig>();
+        }
+
+        Container.Bind<GridConfig>().FromInstance(chosenGrid).AsSingle();
+        Container.Bind<LevelLayout>().FromInstance(chosenLayout).AsSingle();
 
         Container.Bind<IGridService>().To<GridService>().AsSingle();
     }

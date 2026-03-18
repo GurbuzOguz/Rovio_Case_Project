@@ -7,6 +7,13 @@ public class BoxClickHandler : MonoBehaviour
     [SerializeField] private float raycastMaxDistance = 1000f;
 
     private Camera _camera;
+    private IGameStateService _gameState;
+
+    [Inject]
+    public void Construct([InjectOptional] IGameStateService gameState)
+    {
+        _gameState = gameState;
+    }
 
     private void Awake()
     {
@@ -16,6 +23,11 @@ public class BoxClickHandler : MonoBehaviour
     private void Update()
     {
 #if ENABLE_INPUT_SYSTEM
+        if (_gameState != null && _gameState.State != GameRunState.Playing)
+        {
+            return;
+        }
+
         if (UnityEngine.InputSystem.Mouse.current == null)
         {
             return;

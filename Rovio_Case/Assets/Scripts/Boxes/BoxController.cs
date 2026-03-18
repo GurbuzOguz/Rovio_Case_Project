@@ -44,6 +44,7 @@ public class BoxController : MonoBehaviour, IBox
     private Transform _reservedBenchSlot;
     private IProductViewService _productViewService;
     private IProductInteractionService _productInteractionService;
+    private IGameStateService _gameStateService;
 
     private Vector3 _initialScale;
 
@@ -78,13 +79,15 @@ public class BoxController : MonoBehaviour, IBox
         LevelLayout levelLayout,
         [InjectOptional] IBenchService benchService,
         [InjectOptional] IProductViewService productViewService,
-        [InjectOptional] IProductInteractionService productInteractionService)
+        [InjectOptional] IProductInteractionService productInteractionService,
+        [InjectOptional] IGameStateService gameStateService)
     {
         _gridService = gridService;
         _levelLayout = levelLayout;
         _benchService = benchService;
         _productViewService = productViewService;
         _productInteractionService = productInteractionService;
+        _gameStateService = gameStateService;
     }
 
     private void ApplyColorFromPalette()
@@ -566,6 +569,7 @@ public class BoxController : MonoBehaviour, IBox
         if (!_benchService.TryReserveSlot(out _reservedBenchSlot) || _reservedBenchSlot == null)
         {
             Debug.LogError("BENCH FULL -> Level Fail (placeholder)");
+            _gameStateService?.SetLevelFail();
             _state = BoxState.OnBench;
             return;
         }
