@@ -18,6 +18,9 @@ public class SceneServicesInstaller : MonoInstaller
         {
             Container.Bind<IBenchService>().FromInstance(benchSpawner).AsSingle();
         }
+
+        // Requires IGridService + IProductViewService
+        Container.Bind<IProductInteractionService>().To<ProductInteractionService>().AsSingle();
     }
 }
 

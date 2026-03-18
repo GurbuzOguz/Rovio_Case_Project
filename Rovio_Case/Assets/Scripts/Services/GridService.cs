@@ -203,5 +203,229 @@ public class GridService : IGridService
         }
         return counts;
     }
+
+    public List<GridShiftMove> RemoveAndShift(Vector2Int removedCell, GridShiftDirection direction)
+    {
+        var moves = new List<GridShiftMove>();
+
+        if (!_products.ContainsKey(removedCell))
+        {
+            // Zaten boş olabilir
+            return moves;
+        }
+
+        // Önce kaldır
+        _products.Remove(removedCell);
+
+        // Direction'a göre aynı satır veya sütunda kaydır.
+        // Grid'i ortadan bölerek shift ediyoruz:
+        // - Left/Right: sadece sol yarı veya sağ yarı
+        // - Down/Up: sadece alt yarı veya üst yarı
+        int midCol = (Columns - 1) / 2; // sol yarı: [0..midCol], sağ yarı: [midCol+1..Columns-1]
+        int midRow = (Rows - 1) / 2;    // alt yarı: [0..midRow], üst yarı: [midRow+1..Rows-1]
+
+        switch (direction)
+        {
+            case GridShiftDirection.Left:
+                ShiftRowLeft(removedCell.y, 0, midCol, moves);
+                break;
+            case GridShiftDirection.Right:
+                ShiftRowRight(removedCell.y, midCol + 1, Columns - 1, moves);
+                break;
+            case GridShiftDirection.Down:
+                ShiftColumnDown(removedCell.x, 0, midRow, moves);
+                break;
+            case GridShiftDirection.Up:
+                ShiftColumnUp(removedCell.x, midRow + 1, Rows - 1, moves);
+                break;
+        }
+
+        return moves;
+    }
+
+    public List<GridShiftMove> FillEdgeGaps()
+    {
+        var moves = new List<GridShiftMove>();
+
+        if (_products.Count == 0)
+        {
+            return moves;
+        }
+
+        int midCol = (Columns - 1) / 2;
+        int midRow = (Rows - 1) / 2;
+
+        // Sol yarı: sol edge boşluklarını doldur
+        for (int y = 0; y < Rows; y++)
+        {
+            var edge = new Vector2Int(0, y);
+            if (!_products.ContainsKey(edge))
+            {
+                ShiftRowLeft(y, 0, midCol, moves);
+            }
+        }
+
+        // Sağ yarı: sağ edge boşluklarını doldur
+        for (int y = 0; y < Rows; y++)
+        {
+            var edge = new Vector2Int(Columns - 1, y);
+            if (!_products.ContainsKey(edge))
+            {
+                ShiftRowRight(y, midCol + 1, Columns - 1, moves);
+            }
+        }
+
+        // Alt yarı: alt edge boşluklarını doldur
+        for (int x = 0; x < Columns; x++)
+        {
+            var edge = new Vector2Int(x, 0);
+            if (!_products.ContainsKey(edge))
+            {
+                ShiftColumnDown(x, 0, midRow, moves);
+            }
+        }
+
+        // Üst yarı: üst edge boşluklarını doldur
+        for (int x = 0; x < Columns; x++)
+        {
+            var edge = new Vector2Int(x, Rows - 1);
+            if (!_products.ContainsKey(edge))
+            {
+                ShiftColumnUp(x, midRow + 1, Rows - 1, moves);
+            }
+        }
+
+        return moves;
+    }
+
+    private void ShiftRowLeft(int row, int xStart, int xEnd, List<GridShiftMove> moves)
+    {
+        if (xStart > xEnd)
+        {
+            return;
+        }
+
+        xStart = Mathf.Clamp(xStart, 0, Columns - 1);
+        xEnd = Mathf.Clamp(xEnd, 0, Columns - 1);
+
+        for (int x = xStart; x <= xEnd; x++)
+        {
+            var empty = new Vector2Int(x, row);
+            if (_products.ContainsKey(empty))
+            {
+                continue;
+            }
+
+            // Sağa doğru ilk dolu hücreyi bul
+            for (int sx = x + 1; sx <= xEnd; sx++)
+            {
+                var src = new Vector2Int(sx, row);
+                if (_products.TryGetValue(src, out int colorId))
+                {
+                    _products.Remove(src);
+                    _products[empty] = colorId;
+                    moves.Add(new GridShiftMove(src, empty, colorId));
+                    break;
+                }
+            }
+        }
+    }
+
+    private void ShiftRowRight(int row, int xStart, int xEnd, List<GridShiftMove> moves)
+    {
+        if (xStart > xEnd)
+        {
+            return;
+        }
+
+        xStart = Mathf.Clamp(xStart, 0, Columns - 1);
+        xEnd = Mathf.Clamp(xEnd, 0, Columns - 1);
+
+        for (int x = xEnd; x >= xStart; x--)
+        {
+            var empty = new Vector2Int(x, row);
+            if (_products.ContainsKey(empty))
+            {
+                continue;
+            }
+
+            // Sola doğru ilk dolu hücreyi bul
+            for (int sx = x - 1; sx >= xStart; sx--)
+            {
+                var src = new Vector2Int(sx, row);
+                if (_products.TryGetValue(src, out int colorId))
+                {
+                    _products.Remove(src);
+                    _products[empty] = colorId;
+                    moves.Add(new GridShiftMove(src, empty, colorId));
+                    break;
+                }
+            }
+        }
+    }
+
+    private void ShiftColumnDown(int col, int yStart, int yEnd, List<GridShiftMove> moves)
+    {
+        if (yStart > yEnd)
+        {
+            return;
+        }
+
+        yStart = Mathf.Clamp(yStart, 0, Rows - 1);
+        yEnd = Mathf.Clamp(yEnd, 0, Rows - 1);
+
+        for (int y = yStart; y <= yEnd; y++)
+        {
+            var empty = new Vector2Int(col, y);
+            if (_products.ContainsKey(empty))
+            {
+                continue;
+            }
+
+            for (int sy = y + 1; sy <= yEnd; sy++)
+            {
+                var src = new Vector2Int(col, sy);
+                if (_products.TryGetValue(src, out int colorId))
+                {
+                    _products.Remove(src);
+                    _products[empty] = colorId;
+                    moves.Add(new GridShiftMove(src, empty, colorId));
+                    break;
+                }
+            }
+        }
+    }
+
+    private void ShiftColumnUp(int col, int yStart, int yEnd, List<GridShiftMove> moves)
+    {
+        if (yStart > yEnd)
+        {
+            return;
+        }
+
+        yStart = Mathf.Clamp(yStart, 0, Rows - 1);
+        yEnd = Mathf.Clamp(yEnd, 0, Rows - 1);
+
+        for (int y = yEnd; y >= yStart; y--)
+        {
+            var empty = new Vector2Int(col, y);
+            if (_products.ContainsKey(empty))
+            {
+                continue;
+            }
+
+            for (int sy = y - 1; sy >= yStart; sy--)
+            {
+                var src = new Vector2Int(col, sy);
+                if (_products.TryGetValue(src, out int colorId))
+                {
+                    _products.Remove(src);
+                    _products[empty] = colorId;
+                    moves.Add(new GridShiftMove(src, empty, colorId));
+                    break;
+                }
+            }
+        }
+    }
 }
 

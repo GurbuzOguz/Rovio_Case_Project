@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public interface IProductViewService
@@ -13,5 +15,8 @@ public interface IProductViewService
     /// View yoksa false döner.
     /// </summary>
     bool TryConsumeAndPullToBox(Vector2Int cell, Transform boxTransform);
+
+    /// <summary>Grid shift sonrası view'ları yeni hücrelerine kaydırır.</summary>
+    void ApplyShiftMoves(List<GridShiftMove> moves, Action onComplete = null);
 }
 

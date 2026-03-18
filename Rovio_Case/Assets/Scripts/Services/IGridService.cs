@@ -25,5 +25,17 @@ public interface IGridService
 
     /// <summary>Grid'de kalan product sayıları (colorId -> count).</summary>
     IReadOnlyDictionary<int, int> GetRemainingCountsByColorId();
+
+    /// <summary>
+    /// Belirli bir hücreden product kaldırır ve boşluğu, direction yönünde shift ederek doldurur.
+    /// Hem internal data güncellenir hem de hangi hücrelerin nereye kaydığı döndürülür.
+    /// </summary>
+    List<GridShiftMove> RemoveAndShift(Vector2Int removedCell, GridShiftDirection direction);
+
+    /// <summary>
+    /// Edge hücrelerinde boşluk varsa, ilgili yarı içinde ürünleri kaydırarak edge'i doldurur.
+    /// (Remove yok; sadece kaydırma). Yapılan hareketler döndürülür.
+    /// </summary>
+    List<GridShiftMove> FillEdgeGaps();
 }
 

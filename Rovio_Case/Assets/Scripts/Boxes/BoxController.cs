@@ -43,6 +43,7 @@ public class BoxController : MonoBehaviour, IBox
     private IBenchService _benchService;
     private Transform _reservedBenchSlot;
     private IProductViewService _productViewService;
+    private IProductInteractionService _productInteractionService;
 
     private Vector3 _initialScale;
 
@@ -76,12 +77,14 @@ public class BoxController : MonoBehaviour, IBox
         IGridService gridService,
         LevelLayout levelLayout,
         [InjectOptional] IBenchService benchService,
-        [InjectOptional] IProductViewService productViewService)
+        [InjectOptional] IProductViewService productViewService,
+        [InjectOptional] IProductInteractionService productInteractionService)
     {
         _gridService = gridService;
         _levelLayout = levelLayout;
         _benchService = benchService;
         _productViewService = productViewService;
+        _productInteractionService = productInteractionService;
     }
 
     private void ApplyColorFromPalette()
@@ -214,6 +217,12 @@ public class BoxController : MonoBehaviour, IBox
             return;
         }
 
+        if (ShouldDeactivateBecauseColorDepleted())
+        {
+            DeactivateBecauseColorDepleted();
+            return;
+        }
+
         if (_state == BoxState.Idle)
         {
             StartedMovingFromQueue?.Invoke(this);
@@ -283,6 +292,12 @@ public class BoxController : MonoBehaviour, IBox
         }
         _collectTimer = 0f;
 
+        if (ShouldDeactivateBecauseColorDepleted())
+        {
+            DeactivateBecauseColorDepleted();
+            return;
+        }
+
         if (IsFull)
         {
             return;
@@ -312,16 +327,95 @@ public class BoxController : MonoBehaviour, IBox
             Debug.LogWarning("BoxController: IProductViewService not injected. Only grid data will be removed (no pull animation).");
         }
 
-        // Önce view tarafını tüket (varsa) ve box'a çek
-        _productViewService?.TryConsumeAndPullToBox(cell, transform);
+        var shiftDir = DetermineShiftDirection(pos);
 
-        _gridService.RemoveProductAt(cell.x, cell.y);
+        // Atomik tüketim + shift (aynı anda iki box çakışmasın)
+        if (_productInteractionService != null)
+        {
+            bool started = _productInteractionService.TryConsumeAndShift(cell, transform, shiftDir);
+            if (!started)
+            {
+                return; // başka bir işlem sürüyor; bir sonraki tick'te tekrar dener
+            }
+        }
+        else
+        {
+            // Fallback: eski davranış
+            _productViewService?.TryConsumeAndPullToBox(cell, transform);
+            var moves = _gridService.RemoveAndShift(cell, shiftDir);
+            _productViewService?.ApplyShiftMoves(moves);
+        }
         _currentLoad++;
+
+        if (_gridService.AreAllProductsCollected())
+        {
+            Debug.Log("WIN (placeholder): All products collected.");
+        }
+
+        if (ShouldDeactivateBecauseColorDepleted())
+        {
+            DeactivateBecauseColorDepleted();
+            return;
+        }
 
         if (IsFull)
         {
             OnBoxFull();
         }
+    }
+
+    private bool ShouldDeactivateBecauseColorDepleted()
+    {
+        if (_state == BoxState.Destroyed)
+        {
+            return false;
+        }
+
+        if (_gridService == null || boxConfig == null)
+        {
+            return false;
+        }
+
+        var counts = _gridService.GetRemainingCountsByColorId();
+        if (counts == null)
+        {
+            return false;
+        }
+
+        return !counts.TryGetValue(boxConfig.colorId, out int remaining) || remaining <= 0;
+    }
+
+    private void DeactivateBecauseColorDepleted()
+    {
+        // Artık aynı renk product kalmadı → kutu kapanmalı
+        _state = BoxState.Destroyed;
+        ReleaseBenchSlotIfAny();
+
+        if (_moveRoutine != null)
+        {
+            StopCoroutine(_moveRoutine);
+            _moveRoutine = null;
+        }
+
+#if DOTWEEN_EXISTS || true
+        transform.DOKill(false);
+
+        if (visualRoot != null)
+        {
+            visualRoot.DOKill(false);
+            visualRoot
+                .DOScale(Vector3.zero, 0.2f)
+                .SetEase(Ease.InQuad)
+                .SetLink(gameObject, LinkBehaviour.KillOnDisable)
+                .OnComplete(DeactivateBox);
+        }
+        else
+        {
+            DeactivateBox();
+        }
+#else
+        DeactivateBox();
+#endif
     }
 
     private bool IsInEdgePullZone(Vector3 worldPos)
@@ -342,6 +436,53 @@ public class BoxController : MonoBehaviour, IBox
 
         // Kenar bölgeleri: X veya Z ekseninde grid bounds'un dışında olmak yeterli
         return xOutside || zOutside;
+    }
+
+    private GridShiftDirection DetermineShiftDirection(Vector3 worldPos)
+    {
+        // Box hangi kenardaysa o yöne doğru shift et
+        var gc = _levelLayout != null ? _levelLayout.gridConfig : null;
+        if (gc == null)
+        {
+            return GridShiftDirection.Left;
+        }
+
+        float minX = gc.origin.x;
+        float maxX = gc.origin.x + (gc.columns - 1) * gc.cellSize;
+        float minZ = gc.origin.z;
+        float maxZ = gc.origin.z + (gc.rows - 1) * gc.cellSize;
+
+        float leftDist = (minX - worldPos.x);
+        float rightDist = (worldPos.x - maxX);
+        float downDist = (minZ - worldPos.z);
+        float upDist = (worldPos.z - maxZ);
+
+        // outside ise pozitif kabul
+        float best = float.NegativeInfinity;
+        GridShiftDirection dir = GridShiftDirection.Left;
+
+        if (leftDist > best)
+        {
+            best = leftDist;
+            dir = GridShiftDirection.Left;
+        }
+        if (rightDist > best)
+        {
+            best = rightDist;
+            dir = GridShiftDirection.Right;
+        }
+        if (downDist > best)
+        {
+            best = downDist;
+            dir = GridShiftDirection.Down;
+        }
+        if (upDist > best)
+        {
+            best = upDist;
+            dir = GridShiftDirection.Up;
+        }
+
+        return dir;
     }
 
     private void OnBoxFull()
