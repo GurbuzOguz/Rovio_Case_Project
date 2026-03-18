@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using Zenject;
@@ -51,9 +52,9 @@ public class BoxController : MonoBehaviour, IBox
     private BoxState _state = BoxState.Idle;
     private float _collectTimer;
 
-    // Tek bir instance üzerinden tıklama raycast'ini yönetmek için
-    private static BoxController _clickHandlerInstance;
-    private static Camera _cachedCamera;
+    public BoxState State => _state;
+    public event Action<BoxController> StartedMovingFromQueue;
+    public event Action<BoxController> BecameInactive;
 
     public int ColorId => boxConfig != null ? boxConfig.colorId : -1;
     public int CurrentLoad => _currentLoad;
@@ -150,11 +151,6 @@ public class BoxController : MonoBehaviour, IBox
             Debug.LogWarning($"BoxController on {name}: BoxConfig not assigned.");
         }
 
-        // İlk BoxController instance'ını global click handler olarak kullan
-        if (_clickHandlerInstance == null)
-        {
-            _clickHandlerInstance = this;
-        }
     }
 
     private void OnEnable()
@@ -198,54 +194,10 @@ public class BoxController : MonoBehaviour, IBox
 
     private void OnDestroy()
     {
-        if (_clickHandlerInstance == this)
-        {
-            _clickHandlerInstance = null;
-        }
-
         ReleaseBenchSlotIfAny();
     }
 
-    private void Update()
-    {
-        // Sadece tek bir instance input'u dinlesin
-        if (_clickHandlerInstance != this)
-        {
-            return;
-        }
-
-        if (UnityEngine.InputSystem.Mouse.current != null &&
-            UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            HandleClickRaycast(UnityEngine.InputSystem.Mouse.current.position.ReadValue());
-        }
-    }
-
-    private void HandleClickRaycast(Vector2 screenPosition)
-    {
-        if (_cachedCamera == null)
-        {
-            _cachedCamera = Camera.main;
-            if (_cachedCamera == null)
-            {
-                Debug.LogWarning("BoxController: Main Camera not found for click handling.");
-                return;
-            }
-        }
-
-        Ray ray = _cachedCamera.ScreenPointToRay(screenPosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
-        {
-            var box = hit.collider.GetComponentInParent<BoxController>();
-            if (box != null)
-            {
-                Debug.Log($"BoxController click hit: {box.name}, state={box._state}");
-                box.HandleClicked();
-            }
-        }
-    }
-
-    private void HandleClicked()
+    public void OnClickedByInput()
     {
         if (_state == BoxState.Idle || _state == BoxState.OnBench)
         {
@@ -260,6 +212,11 @@ public class BoxController : MonoBehaviour, IBox
         {
             Debug.LogWarning($"BoxController on {name}: Shared BoxPath is missing or empty.");
             return;
+        }
+
+        if (_state == BoxState.Idle)
+        {
+            StartedMovingFromQueue?.Invoke(this);
         }
 
         if (_moveRoutine != null)
@@ -400,6 +357,9 @@ public class BoxController : MonoBehaviour, IBox
         }
 
 #if DOTWEEN_EXISTS || true
+        // Box üzerindeki tüm tweens'leri anında durdur (null target uyarılarını engeller)
+        transform.DOKill(false);
+
         if (visualRoot != null)
         {
             visualRoot.DOKill(false);
@@ -427,6 +387,7 @@ public class BoxController : MonoBehaviour, IBox
             col.enabled = false;
         }
 
+        BecameInactive?.Invoke(this);
         gameObject.SetActive(false);
     }
 

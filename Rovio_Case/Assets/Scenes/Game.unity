@@ -1615,6 +1615,54 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1751769394}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &794508630
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 794508632}
+  - component: {fileID: 794508631}
+  m_Layer: 0
+  m_Name: BoxClickHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &794508631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 794508630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69d9f2c109e8d2d4b9ab23dbd868c75c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoxClickHandler
+  boxLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  raycastMaxDistance: 1000
+--- !u!4 &794508632
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 794508630}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1886,7 +1934,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProductViewService
   pullDuration: 0.18
   pullScaleTo: 0.2
-  pullEase: 26
+  pullMoveEase: 26
+  pullScaleEase: 5
 --- !u!4 &1334221647
 Transform:
   m_ObjectHideFlags: 0
@@ -2150,16 +2199,18 @@ MonoBehaviour:
   boxesParent: {fileID: 1751769394}
   spawnPoints:
   - {fileID: 1789042023}
-  - {fileID: 38798458}
-  - {fileID: 1386586813}
   - {fileID: 333506351}
-  - {fileID: 1292149703}
-  - {fileID: 443111817}
   - {fileID: 752724782}
+  - {fileID: 38798458}
+  - {fileID: 1292149703}
   - {fileID: 1187192624}
+  - {fileID: 1386586813}
+  - {fileID: 443111817}
   - {fileID: 1436566337}
   defaultBoxCapacity: 9
   defaultBoxMoveSpeed: 7
+  queueShiftDuration: 0.2
+  queueRowSize: 3
 --- !u!1 &1789042022
 GameObject:
   m_ObjectHideFlags: 0
@@ -2555,3 +2606,4 @@ SceneRoots:
   - {fileID: 724837406}
   - {fileID: 418714731}
   - {fileID: 1334221647}
+  - {fileID: 794508632}

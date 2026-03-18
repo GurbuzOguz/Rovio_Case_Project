@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public interface IGridService
@@ -21,5 +22,8 @@ public interface IGridService
     /// o satır/sütunda (aynı X veya aynı Y) verilen colorId'ye sahip bir product hücresi bulur.
     /// </summary>
     bool TryFindAlignedProductCell(Vector3 worldPosition, float alignTolerance, int colorId, out Vector2Int cell);
+
+    /// <summary>Grid'de kalan product sayıları (colorId -> count).</summary>
+    IReadOnlyDictionary<int, int> GetRemainingCountsByColorId();
 }
 

@@ -184,5 +184,24 @@ public class GridService : IGridService
         cell = bestCell;
         return true;
     }
+
+    public IReadOnlyDictionary<int, int> GetRemainingCountsByColorId()
+    {
+        // snapshot; caller modify edemesin
+        var counts = new Dictionary<int, int>();
+        foreach (var kvp in _products)
+        {
+            int id = kvp.Value;
+            if (counts.TryGetValue(id, out int c))
+            {
+                counts[id] = c + 1;
+            }
+            else
+            {
+                counts[id] = 1;
+            }
+        }
+        return counts;
+    }
 }
 
