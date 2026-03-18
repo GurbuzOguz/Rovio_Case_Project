@@ -125,14 +125,18 @@ public class GridService : IGridService
         // Grid üzerindeki hücre merkezleri:
         // xCenter = origin.x + x*size
         // zCenter = origin.z + y*size
+        // Not: Box gridin dışında dolaşabileceği için en yakın satır/sütunu clamp ediyoruz.
         float localX = worldPosition.x - origin.x;
         float localZ = worldPosition.z - origin.z;
 
-        int alignedColumn = Mathf.RoundToInt(localX / size);
-        int alignedRow = Mathf.RoundToInt(localZ / size);
+        int nearestColumn = Mathf.Clamp(Mathf.RoundToInt(localX / size), 0, Columns - 1);
+        int nearestRow = Mathf.Clamp(Mathf.RoundToInt(localZ / size), 0, Rows - 1);
 
-        bool columnAligned = Mathf.Abs(worldPosition.x - (origin.x + alignedColumn * size)) <= alignTolerance;
-        bool rowAligned = Mathf.Abs(worldPosition.z - (origin.z + alignedRow * size)) <= alignTolerance;
+        float colCenterX = origin.x + nearestColumn * size;
+        float rowCenterZ = origin.z + nearestRow * size;
+
+        bool columnAligned = Mathf.Abs(worldPosition.x - colCenterX) <= alignTolerance;
+        bool rowAligned = Mathf.Abs(worldPosition.z - rowCenterZ) <= alignTolerance;
 
         if (!columnAligned && !rowAligned)
         {
@@ -152,20 +156,11 @@ public class GridService : IGridService
             }
 
             var c = kvp.Key;
-            if (columnAligned && c.x != alignedColumn)
-            {
-                // sütun hizalıysa sadece o sütun
-                continue;
-            }
+            bool matchesColumn = columnAligned && c.x == nearestColumn;
+            bool matchesRow = rowAligned && c.y == nearestRow;
 
-            if (rowAligned && !columnAligned && c.y != alignedRow)
-            {
-                // satır hizalıysa (ve sütun hizalı değilse) sadece o satır
-                continue;
-            }
-
-            // Eğer hem satır hem sütun hizalıysa, iki eksenden birine uyanları kabul ediyoruz:
-            if (rowAligned && columnAligned && c.x != alignedColumn && c.y != alignedRow)
+            // İki hizalamadan en az birine uymalı
+            if (!matchesColumn && !matchesRow)
             {
                 continue;
             }

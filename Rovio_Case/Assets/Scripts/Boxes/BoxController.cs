@@ -33,7 +33,7 @@ public class BoxController : MonoBehaviour, IBox
     [SerializeField] private float alignTolerance = 0.2f;
     [SerializeField] private float collectInterval = 0.05f;
     [SerializeField] private float pullMaxDistance = 2.0f;
-    [SerializeField] private bool onlyPullFromCornerZones = true;
+    [SerializeField] private bool onlyPullFromEdgeZones = true;
     [SerializeField] private float cornerOutsideMargin = 0.15f;
 
     private IGridService _gridService;
@@ -132,7 +132,15 @@ public class BoxController : MonoBehaviour, IBox
     {
         if (visualRoot == null)
         {
-            visualRoot = transform;
+            // Collider olan root'u scale etmeyelim: mümkünse renderer child'ını görsel root yap
+            var r = GetComponentInChildren<Renderer>();
+            visualRoot = r != null ? r.transform : transform;
+        }
+
+        // Eğer hala root ise ve üzerinde collider varsa, ilk child'ı kullanmayı dene
+        if (visualRoot == transform && GetComponent<Collider>() != null && transform.childCount > 0)
+        {
+            visualRoot = transform.GetChild(0);
         }
 
         _initialScale = visualRoot.localScale;
@@ -160,6 +168,18 @@ public class BoxController : MonoBehaviour, IBox
     }
 
 #if DOTWEEN_EXISTS || true
+    private void OnDisable()
+    {
+        // Objeyi deactivate ettiğimizde aktif tween'leri temizle
+        transform.DOKill(false);
+        if (visualRoot != null)
+        {
+            visualRoot.DOKill(false);
+        }
+    }
+#endif
+
+#if DOTWEEN_EXISTS || true
     private void PlaySpawnAnimation()
     {
         if (visualRoot == null)
@@ -169,7 +189,10 @@ public class BoxController : MonoBehaviour, IBox
 
         visualRoot.DOKill(false);
         visualRoot.localScale = Vector3.zero;
-        visualRoot.DOScale(_initialScale, spawnScaleDuration).SetEase(Ease.OutBack);
+        visualRoot
+            .DOScale(_initialScale, spawnScaleDuration)
+            .SetEase(Ease.OutBack)
+            .SetLink(gameObject, LinkBehaviour.KillOnDisable);
     }
 #endif
 
@@ -268,6 +291,7 @@ public class BoxController : MonoBehaviour, IBox
                 .DOMove(targetPos, segmentDuration)
                 .SetEase(Ease.Linear)
                 .OnUpdate(TryCollectAlignedProductIfAny);
+            moveTween.SetLink(gameObject, LinkBehaviour.KillOnDisable);
 
             yield return moveTween.WaitForCompletion();
 #else
@@ -308,7 +332,7 @@ public class BoxController : MonoBehaviour, IBox
         }
 
         Vector3 pos = transform.position;
-        if (onlyPullFromCornerZones && !IsInCornerPullZone(pos))
+        if (onlyPullFromEdgeZones && !IsInEdgePullZone(pos))
         {
             return;
         }
@@ -343,7 +367,7 @@ public class BoxController : MonoBehaviour, IBox
         }
     }
 
-    private bool IsInCornerPullZone(Vector3 worldPos)
+    private bool IsInEdgePullZone(Vector3 worldPos)
     {
         if (_levelLayout == null || _levelLayout.gridConfig == null)
         {
@@ -359,22 +383,51 @@ public class BoxController : MonoBehaviour, IBox
         bool xOutside = worldPos.x < (minX - cornerOutsideMargin) || worldPos.x > (maxX + cornerOutsideMargin);
         bool zOutside = worldPos.z < (minZ - cornerOutsideMargin) || worldPos.z > (maxZ + cornerOutsideMargin);
 
-        // Köşe bölgeleri: hem X hem Z grid bounds'un dışında olmalı
-        return xOutside && zOutside;
+        // Kenar bölgeleri: X veya Z ekseninde grid bounds'un dışında olmak yeterli
+        return xOutside || zOutside;
     }
 
     private void OnBoxFull()
     {
         _state = BoxState.Destroyed;
         ReleaseBenchSlotIfAny();
+
+        // Hareket coroutine'u varsa durdur
+        if (_moveRoutine != null)
+        {
+            StopCoroutine(_moveRoutine);
+            _moveRoutine = null;
+        }
+
 #if DOTWEEN_EXISTS || true
-        transform
-            .DOScale(Vector3.zero, 0.25f)
-            .SetEase(Ease.InBack)
-            .OnComplete(() => Destroy(gameObject));
+        if (visualRoot != null)
+        {
+            visualRoot.DOKill(false);
+            visualRoot
+                .DOScale(Vector3.zero, 0.25f)
+                .SetEase(Ease.InQuad)
+                .SetLink(gameObject, LinkBehaviour.KillOnDisable)
+                .OnComplete(DeactivateBox);
+        }
+        else
+        {
+            DeactivateBox();
+        }
 #else
-        Destroy(gameObject);
+        DeactivateBox();
 #endif
+    }
+
+    private void DeactivateBox()
+    {
+        // Collider ve scriptler dursun, GC ve destroy maliyeti olmasın
+        var col = GetComponent<Collider>();
+        if (col != null)
+        {
+            col.enabled = false;
+        }
+
+        gameObject.SetActive(false);
     }
 
     private void ReleaseBenchSlotIfAny()
@@ -418,7 +471,10 @@ public class BoxController : MonoBehaviour, IBox
         _state = BoxState.OnBench;
 
 #if DOTWEEN_EXISTS || true
-        transform.DOMove(_reservedBenchSlot.position, 0.25f).SetEase(Ease.OutQuad);
+        transform
+            .DOMove(_reservedBenchSlot.position, 0.25f)
+            .SetEase(Ease.OutQuad)
+            .SetLink(gameObject, LinkBehaviour.KillOnDisable);
 #else
         transform.position = _reservedBenchSlot.position;
 #endif

@@ -131,3 +131,9 @@ MonoBehaviour:
   defaultBoxColor: {r: 1, g: 1, b: 1, a: 1}
   playSpawnAnimation: 1
   spawnScaleDuration: 0.25
+  visualRoot: {fileID: 0}
+  alignTolerance: 0.2
+  collectInterval: 0.05
+  pullMaxDistance: 3
+  onlyPullFromEdgeZones: 1
+  cornerOutsideMargin: 0.15

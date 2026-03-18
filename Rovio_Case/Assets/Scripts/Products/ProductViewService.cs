@@ -9,7 +9,8 @@ public class ProductViewService : MonoBehaviour, IProductViewService
     [Header("Pull Animation")]
     [SerializeField] private float pullDuration = 0.18f;
     [SerializeField] private float pullScaleTo = 0.2f;
-    [SerializeField] private Ease pullEase = Ease.InBack;
+    [SerializeField] private Ease pullMoveEase = Ease.InBack;
+    [SerializeField] private Ease pullScaleEase = Ease.InQuad;
 
     private readonly Dictionary<Vector2Int, ProductView> _views = new Dictionary<Vector2Int, ProductView>();
 
@@ -46,8 +47,10 @@ public class ProductViewService : MonoBehaviour, IProductViewService
 
             Vector3 targetPos = boxTransform.position;
             Sequence seq = DOTween.Sequence();
-            seq.Join(t.DOMove(targetPos, pullDuration).SetEase(pullEase));
-            seq.Join(t.DOScale(Vector3.one * pullScaleTo, pullDuration).SetEase(pullEase));
+            seq.Join(t.DOMove(targetPos, pullDuration).SetEase(pullMoveEase));
+            seq.Join(t.DOScale(Vector3.one * pullScaleTo, pullDuration).SetEase(pullScaleEase));
+            // View destroy edilirse tween otomatik sonlansın (null target uyarılarını önler)
+            seq.SetLink(view.gameObject, LinkBehaviour.KillOnDestroy);
             seq.OnComplete(() =>
             {
                 if (view != null)
