@@ -4,6 +4,9 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using Zenject;
+#if DOTWEEN_EXISTS || true
+using DG.Tweening;
+#endif
 
 [DisallowMultipleComponent]
 public class UIManager : MonoBehaviour
@@ -25,6 +28,21 @@ public class UIManager : MonoBehaviour
     public bool autoRefreshRemainingEachFrame = true;
     [SerializeField] private float uiClickActionDelay = 0.08f;
 
+    [Header("UI Intro Animation")]
+    [SerializeField] private bool playIntroAnimations = true;
+    [SerializeField] private float introDuration = 0.35f;
+    [SerializeField] private float introStagger = 0.08f;
+    [SerializeField] private float introOffsetX = 500f;
+    [SerializeField] private Ease introEase = Ease.OutCubic;
+
+    private RectTransform _levelRect;
+    private RectTransform _remainingRect;
+    private RectTransform _endScreenRect;
+    private Vector2 _levelAnchorPos;
+    private Vector2 _remainingAnchorPos;
+    private Vector2 _endScreenAnchorPos;
+    private bool _introPositionsCached;
+
     private IGridService _gridService;
     private IGameStateService _gameState;
     private ILevelFlowService _levelFlow;
@@ -45,6 +63,8 @@ public class UIManager : MonoBehaviour
 
     private void Awake()
     {
+        CacheIntroTargets();
+
         if (retryButton != null)
         {
             retryButton.onClick.RemoveListener(OnRetryClicked);
@@ -64,6 +84,13 @@ public class UIManager : MonoBehaviour
         {
             _gameState.StateChanged += HandleStateChanged;
         }
+
+#if DOTWEEN_EXISTS || true
+        if (playIntroAnimations)
+        {
+            PlayHudIntro();
+        }
+#endif
 
         RefreshLevelText();
         RefreshRemainingText();
@@ -125,9 +152,10 @@ public class UIManager : MonoBehaviour
 
     private void HandleStateChanged(GameRunState state)
     {
+        bool showEndScreen = state == GameRunState.LevelComplete || state == GameRunState.LevelFail;
         if (endScreenRoot != null)
         {
-            endScreenRoot.SetActive(state == GameRunState.LevelComplete || state == GameRunState.LevelFail);
+            endScreenRoot.SetActive(showEndScreen);
         }
 
         if (endTitleText != null)
@@ -135,6 +163,13 @@ public class UIManager : MonoBehaviour
             endTitleText.text = state == GameRunState.LevelComplete ? "LEVEL COMPLETE" :
                 state == GameRunState.LevelFail ? "LEVEL FAIL" : "";
         }
+
+#if DOTWEEN_EXISTS || true
+        if (playIntroAnimations && showEndScreen)
+        {
+            PlayEndScreenIntro();
+        }
+#endif
 
         if (nextButton != null && _levelFlow != null)
         {
@@ -163,5 +198,77 @@ public class UIManager : MonoBehaviour
 
         action?.Invoke();
     }
+
+    private void CacheIntroTargets()
+    {
+        if (_introPositionsCached)
+        {
+            return;
+        }
+
+        _levelRect = levelText != null ? levelText.rectTransform : null;
+        _remainingRect = remainingText != null ? remainingText.rectTransform : null;
+        _endScreenRect = endScreenRoot != null ? endScreenRoot.GetComponent<RectTransform>() : null;
+
+        if (_levelRect != null)
+        {
+            _levelAnchorPos = _levelRect.anchoredPosition;
+        }
+
+        if (_remainingRect != null)
+        {
+            _remainingAnchorPos = _remainingRect.anchoredPosition;
+        }
+
+        if (_endScreenRect != null)
+        {
+            _endScreenAnchorPos = _endScreenRect.anchoredPosition;
+        }
+
+        _introPositionsCached = true;
+    }
+
+#if DOTWEEN_EXISTS || true
+    private void PlayHudIntro()
+    {
+        CacheIntroTargets();
+        if (_levelRect != null)
+        {
+            PlaySlideIn(_levelRect, _levelAnchorPos, 0f);
+        }
+
+        if (_remainingRect != null)
+        {
+            PlaySlideIn(_remainingRect, _remainingAnchorPos, introStagger);
+        }
+    }
+
+    private void PlayEndScreenIntro()
+    {
+        CacheIntroTargets();
+        if (_endScreenRect == null)
+        {
+            return;
+        }
+
+        PlaySlideIn(_endScreenRect, _endScreenAnchorPos, 0f);
+    }
+
+    private void PlaySlideIn(RectTransform target, Vector2 finalPos, float delay)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        target.DOKill(false);
+        target.anchoredPosition = finalPos + Vector2.right * introOffsetX;
+        target
+            .DOAnchorPos(finalPos, introDuration)
+            .SetEase(introEase)
+            .SetDelay(delay)
+            .SetLink(gameObject, LinkBehaviour.KillOnDisable);
+    }
+#endif
 }
 
