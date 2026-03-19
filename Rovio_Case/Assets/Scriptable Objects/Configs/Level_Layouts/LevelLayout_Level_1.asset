@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: LevelLayout_Level_1
   m_EditorClassIdentifier: Assembly-CSharp::LevelLayout
   gridConfig: {fileID: 11400000, guid: c8d218240196df342b9d0258bb8e417a, type: 2}
+  backgroundColor: {r: 0.5254902, g: 0.6862745, b: 0.77254903, a: 1}
   productPalette: {fileID: 11400000, guid: 73517239225195d4dad18354de83563d, type: 2}
   products:
   - x: 1

@@ -7,6 +7,10 @@ public class LevelLayout : ScriptableObject
     [Header("Grid Reference")]
     public GridConfig gridConfig;
 
+    [Header("Background")]
+    [Tooltip("Level için arka plan rengi. Product palette ile karışmaz.")]
+    public Color backgroundColor = new Color(0.12f, 0.12f, 0.12f, 1f);
+
     [Header("Products Palette")]
     public ProductPalette productPalette;
 

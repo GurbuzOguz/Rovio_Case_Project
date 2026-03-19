@@ -57,6 +57,12 @@ public class SceneServicesInstaller : MonoInstaller
 
         Container.BindInterfacesTo<FrameRateInitializer>().AsSingle().NonLazy();
 
+        // Level'e göre background rengini palette'den ayarla.
+        if (!Container.HasBinding<LevelBackgroundColorInitializer>())
+        {
+            Container.BindInterfacesTo<LevelBackgroundColorInitializer>().AsSingle().NonLazy();
+        }
+
         // SFX service (2D, overlapping via AudioSource pool)
         if (!Container.HasBinding<ISfxService>())
         {

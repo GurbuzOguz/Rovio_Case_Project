@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: LevelLayout_Level_3
   m_EditorClassIdentifier: Assembly-CSharp::LevelLayout
   gridConfig: {fileID: 11400000, guid: c8d218240196df342b9d0258bb8e417a, type: 2}
+  backgroundColor: {r: 0.77254903, g: 0.581077, b: 0.5254902, a: 1}
   productPalette: {fileID: 11400000, guid: c98ac11084d1c8b4fafb2b5e7f8cb14c, type: 2}
   products: []
   benchCapacity: 5
