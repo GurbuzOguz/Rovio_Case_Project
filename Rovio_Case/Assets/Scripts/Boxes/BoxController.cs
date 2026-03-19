@@ -37,6 +37,12 @@ public class BoxController : MonoBehaviour, IBox
     [SerializeField] private bool onlyPullFromEdgeZones = true;
     [SerializeField] private float cornerOutsideMargin = 0.15f;
 
+    [Header("Collect Feedback")]
+    [SerializeField] private bool playCollectScaleFeedback = true;
+    [SerializeField] private float collectScaleAmount = 0.73f;
+    [SerializeField] private float collectScaleUpDuration = 0.08f;
+    [SerializeField] private float collectScaleDownDuration = 0.12f;
+
     private IGridService _gridService;
     private LevelLayout _levelLayout;
     private ProductPalette _paletteOverride;
@@ -54,6 +60,9 @@ public class BoxController : MonoBehaviour, IBox
     private Coroutine _moveRoutine;
     private BoxState _state = BoxState.Idle;
     private float _collectTimer;
+#if DOTWEEN_EXISTS || true
+    private Sequence _collectScaleTween;
+#endif
 
     public BoxState State => _state;
     public event Action<BoxController> StartedMovingFromQueue;
@@ -155,6 +164,10 @@ public class BoxController : MonoBehaviour, IBox
 
         _initialScale = visualRoot.localScale;
 
+#if DOTWEEN_EXISTS || true
+        ConfigureCollectScaleTween();
+#endif
+
         if (boxConfig == null)
         {
             Debug.LogWarning($"BoxController on {name}: BoxConfig not assigned.");
@@ -180,6 +193,13 @@ public class BoxController : MonoBehaviour, IBox
         if (visualRoot != null)
         {
             visualRoot.DOKill(false);
+            visualRoot.localScale = _initialScale;
+        }
+
+        if (_collectScaleTween != null && _collectScaleTween.IsActive())
+        {
+            _collectScaleTween.Pause();
+            _collectScaleTween.Rewind();
         }
     }
 #endif
@@ -203,6 +223,12 @@ public class BoxController : MonoBehaviour, IBox
 
     private void OnDestroy()
     {
+#if DOTWEEN_EXISTS || true
+        if (_collectScaleTween != null && _collectScaleTween.IsActive())
+        {
+            _collectScaleTween.Kill(false);
+        }
+#endif
         ReleaseBenchSlotIfAny();
     }
 
@@ -316,6 +342,11 @@ public class BoxController : MonoBehaviour, IBox
             return;
         }
 
+        if (_productViewService == null)
+        {
+            Debug.LogWarning("BoxController: IProductViewService not injected. Only grid data will be removed (no pull animation).");
+        }
+
         if (!_gridService.TryFindAlignedProductCell(pos, alignTolerance, boxConfig.colorId, out var cell))
         {
             return;
@@ -329,36 +360,13 @@ public class BoxController : MonoBehaviour, IBox
             return;
         }
 
-        if (_productViewService == null)
-        {
-            Debug.LogWarning("BoxController: IProductViewService not injected. Only grid data will be removed (no pull animation).");
-        }
-
         var shiftDir = DetermineShiftDirection(pos);
-
-        // Atomik tüketim + shift (aynı anda iki box çakışmasın)
-        /*if (_productInteractionService != null)
-        {
-            bool started = _productInteractionService.TryConsumeAndShift(cell, transform, shiftDir);
-            if (!started)
-            {
-                return; // başka bir işlem sürüyor; bir sonraki tick'te tekrar dener
-            }
-        }
-        else
-        {
-            // Fallback: eski davranış
-            _productViewService?.TryConsumeAndPullToBox(cell, transform);
-            var moves = _gridService.RemoveAndShift(cell, shiftDir);
-            _productViewService?.ApplyShiftMoves(moves);
-        }
-*/
-            _productViewService?.TryConsumeAndPullToBox(cell, transform);
-            var moves = _gridService.RemoveAndShift(cell, shiftDir);
-            _productViewService?.ApplyShiftMoves(moves);
-
+        _productViewService?.TryConsumeAndPullToBox(cell, transform);
+        var moves = _gridService.RemoveAndShift(cell, shiftDir);
+        _productViewService?.ApplyShiftMoves(moves);
         _sfxService?.Play(SfxId.ProductCollect);
         _currentLoad++;
+        PlayCollectScaleFeedback();
 
         if (_gridService.AreAllProductsCollected())
         {
@@ -397,6 +405,57 @@ public class BoxController : MonoBehaviour, IBox
 
         return !counts.TryGetValue(boxConfig.colorId, out int remaining) || remaining <= 0;
     }
+
+#if DOTWEEN_EXISTS || true
+    private void ConfigureCollectScaleTween()
+    {
+        if (visualRoot == null)
+        {
+            return;
+        }
+
+        if (_collectScaleTween != null && _collectScaleTween.IsActive())
+        {
+            _collectScaleTween.Kill(false);
+        }
+
+        float amt = Mathf.Max(0.001f, collectScaleAmount);
+        float upDur = Mathf.Max(0.01f, collectScaleUpDuration);
+        float downDur = Mathf.Max(0.01f, collectScaleDownDuration);
+
+        _collectScaleTween = DOTween.Sequence();
+        _collectScaleTween
+            .SetAutoKill(false)
+            .Pause()
+            .Append(visualRoot.DOScale(_initialScale * (1f + amt), upDur).SetEase(Ease.OutQuad))
+            .Append(visualRoot.DOScale(_initialScale, downDur).SetEase(Ease.InQuad));
+    }
+
+    private void PlayCollectScaleFeedback()
+    {
+        if (!playCollectScaleFeedback || visualRoot == null)
+        {
+            return;
+        }
+
+        if (_collectScaleTween == null || !_collectScaleTween.IsActive())
+        {
+            ConfigureCollectScaleTween();
+        }
+
+        if (_collectScaleTween == null || !_collectScaleTween.IsActive())
+        {
+            return;
+        }
+
+        _collectScaleTween.Rewind();
+        _collectScaleTween.Restart();
+    }
+#else
+    private void PlayCollectScaleFeedback()
+    {
+    }
+#endif
 
     private void DeactivateBecauseColorDepleted()
     {
@@ -580,7 +639,6 @@ public class BoxController : MonoBehaviour, IBox
 
         if (!_benchService.TryReserveSlot(out _reservedBenchSlot) || _reservedBenchSlot == null)
         {
-            Debug.LogError("BENCH FULL -> Level Fail (placeholder)");
             _sfxService?.Play(SfxId.LevelFail);
             _gameStateService?.SetLevelFail();
             _state = BoxState.OnBench;

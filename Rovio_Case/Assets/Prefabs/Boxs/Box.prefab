@@ -137,3 +137,7 @@ MonoBehaviour:
   pullMaxDistance: 3
   onlyPullFromEdgeZones: 1
   cornerOutsideMargin: 0.15
+  playCollectScaleFeedback: 1
+  collectScaleAmount: 0.5
+  collectScaleUpDuration: 0.05
+  collectScaleDownDuration: 0.08

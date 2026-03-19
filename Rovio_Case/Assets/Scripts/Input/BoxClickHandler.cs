@@ -28,16 +28,6 @@ public class BoxClickHandler : MonoBehaviour
             return;
         }
 
-        if (UnityEngine.InputSystem.Mouse.current == null)
-        {
-            return;
-        }
-
-        if (!UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            return;
-        }
-
         if (_camera == null)
         {
             _camera = Camera.main;
@@ -47,7 +37,11 @@ public class BoxClickHandler : MonoBehaviour
             }
         }
 
-        Vector2 screenPos = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
+        if (!TryGetPointerDownScreenPosition(out Vector2 screenPos))
+        {
+            return;
+        }
+
         Ray ray = _camera.ScreenPointToRay(screenPos);
         if (Physics.Raycast(ray, out RaycastHit hit, raycastMaxDistance, boxLayerMask))
         {
@@ -59,5 +53,28 @@ public class BoxClickHandler : MonoBehaviour
         }
 #endif
     }
+
+#if ENABLE_INPUT_SYSTEM
+    private bool TryGetPointerDownScreenPosition(out Vector2 screenPos)
+    {
+        // Device simulator/mobile için touch öncelikli.
+        var touch = UnityEngine.InputSystem.Touchscreen.current;
+        if (touch != null && touch.primaryTouch.press.wasPressedThisFrame)
+        {
+            screenPos = touch.primaryTouch.position.ReadValue();
+            return true;
+        }
+
+        var mouse = UnityEngine.InputSystem.Mouse.current;
+        if (mouse != null && mouse.leftButton.wasPressedThisFrame)
+        {
+            screenPos = mouse.position.ReadValue();
+            return true;
+        }
+
+        screenPos = default;
+        return false;
+    }
+#endif
 }
 
