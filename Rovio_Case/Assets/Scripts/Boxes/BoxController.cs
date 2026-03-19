@@ -660,21 +660,22 @@ public class BoxController : MonoBehaviour, IBox
         }
 
         _state = BoxState.OnBench;
+        Vector3 benchPos = _reservedBenchSlot.position;
 
 #if DOTWEEN_EXISTS || true
         transform
-            .DOMove(_reservedBenchSlot.position, 0.25f)
+            .DOMove(benchPos, 0.25f)
             .SetEase(Ease.OutQuad)
             .SetLink(gameObject, LinkBehaviour.KillOnDisable)
             .OnComplete(() =>
             {
                 _sfxService?.Play(SfxId.BenchSit);
-                _particleService?.Play(ParticleId.BenchSit, _reservedBenchSlot.position);
+                _particleService?.Play(ParticleId.BenchSit, benchPos);
             });
 #else
-        transform.position = _reservedBenchSlot.position;
+        transform.position = benchPos;
         _sfxService?.Play(SfxId.BenchSit);
-        _particleService?.Play(ParticleId.BenchSit, _reservedBenchSlot.position);
+        _particleService?.Play(ParticleId.BenchSit, benchPos);
 #endif
     }
 }

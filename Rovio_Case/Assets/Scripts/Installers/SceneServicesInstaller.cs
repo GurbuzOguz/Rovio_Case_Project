@@ -55,6 +55,8 @@ public class SceneServicesInstaller : MonoInstaller
             Container.BindInterfacesTo<LevelEndTickable>().AsSingle();
         }
 
+        Container.BindInterfacesTo<FrameRateInitializer>().AsSingle().NonLazy();
+
         // SFX service (2D, overlapping via AudioSource pool)
         if (!Container.HasBinding<ISfxService>())
         {
