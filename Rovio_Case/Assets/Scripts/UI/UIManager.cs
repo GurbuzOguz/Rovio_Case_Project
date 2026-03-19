@@ -47,18 +47,21 @@ public class UIManager : MonoBehaviour
     private IGameStateService _gameState;
     private ILevelFlowService _levelFlow;
     private ISfxService _sfxService;
+    private IHapticService _hapticService;
 
     [Inject]
     public void Construct(
         IGridService gridService,
         IGameStateService gameState,
         ILevelFlowService levelFlow,
-        [InjectOptional] ISfxService sfxService)
+        [InjectOptional] ISfxService sfxService,
+        [InjectOptional] IHapticService hapticService)
     {
         _gridService = gridService;
         _gameState = gameState;
         _levelFlow = levelFlow;
         _sfxService = sfxService;
+        _hapticService = hapticService;
     }
 
     private void Awake()
@@ -180,12 +183,14 @@ public class UIManager : MonoBehaviour
     private void OnRetryClicked()
     {
         _sfxService?.Play(SfxId.UiClick);
+        _hapticService?.Selection();
         StartCoroutine(RunAfterUiClickDelay(() => _levelFlow?.RestartLevel()));
     }
 
     private void OnNextClicked()
     {
         _sfxService?.Play(SfxId.UiClick);
+        _hapticService?.Selection();
         StartCoroutine(RunAfterUiClickDelay(() => _levelFlow?.LoadNextLevel()));
     }
 

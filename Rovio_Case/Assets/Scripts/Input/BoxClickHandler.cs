@@ -43,18 +43,41 @@ public class BoxClickHandler : MonoBehaviour
         }
 
         Ray ray = _camera.ScreenPointToRay(screenPos);
-        if (Physics.Raycast(ray, out RaycastHit hit, raycastMaxDistance, boxLayerMask))
+        if (TryGetClickedBox(ray, out BoxController box))
         {
-            var box = hit.collider.GetComponentInParent<BoxController>();
-            if (box != null)
-            {
-                box.OnClickedByInput();
-            }
+            box.OnClickedByInput();
         }
 #endif
     }
 
 #if ENABLE_INPUT_SYSTEM
+    private bool TryGetClickedBox(Ray ray, out BoxController box)
+    {
+        // Tek hit yerine tüm hit'leri tarıyoruz; önde başka collider olsa da arkadaki box bulunabilsin.
+        var hits = Physics.RaycastAll(ray, raycastMaxDistance, boxLayerMask, QueryTriggerInteraction.Ignore);
+        if (hits == null || hits.Length == 0)
+        {
+            box = null;
+            return false;
+        }
+
+        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+        for (int i = 0; i < hits.Length; i++)
+        {
+            var candidate = hits[i].collider != null
+                ? hits[i].collider.GetComponentInParent<BoxController>()
+                : null;
+            if (candidate != null)
+            {
+                box = candidate;
+                return true;
+            }
+        }
+
+        box = null;
+        return false;
+    }
+
     private bool TryGetPointerDownScreenPosition(out Vector2 screenPos)
     {
         // Device simulator/mobile için touch öncelikli.

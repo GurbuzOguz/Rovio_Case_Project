@@ -33,6 +33,11 @@ public class SceneServicesInstaller : MonoInstaller
             Container.Bind<ILevelFlowService>().To<LevelFlowService>().AsSingle();
         }
 
+        if (!Container.HasBinding<IHapticService>())
+        {
+            Container.Bind<IHapticService>().To<HapticService>().AsSingle();
+        }
+
         if (!Container.HasBinding<Zenject.ITickable>())
         {
             // Win detector: polls AreAllProductsCollected

@@ -52,6 +52,7 @@ public class BoxController : MonoBehaviour, IBox
     private IProductInteractionService _productInteractionService;
     private IGameStateService _gameStateService;
     private ISfxService _sfxService;
+    private IHapticService _hapticService;
 
     private Vector3 _initialScale;
 
@@ -91,7 +92,8 @@ public class BoxController : MonoBehaviour, IBox
         [InjectOptional] IProductViewService productViewService,
         [InjectOptional] IProductInteractionService productInteractionService,
         [InjectOptional] IGameStateService gameStateService,
-        [InjectOptional] ISfxService sfxService)
+        [InjectOptional] ISfxService sfxService,
+        [InjectOptional] IHapticService hapticService)
     {
         _gridService = gridService;
         _levelLayout = levelLayout;
@@ -100,6 +102,7 @@ public class BoxController : MonoBehaviour, IBox
         _productInteractionService = productInteractionService;
         _gameStateService = gameStateService;
         _sfxService = sfxService;
+        _hapticService = hapticService;
     }
 
     private void ApplyColorFromPalette()
@@ -238,6 +241,7 @@ public class BoxController : MonoBehaviour, IBox
         {
             ReleaseBenchSlotIfAny();
             _sfxService?.Play(SfxId.BoxClick);
+            _hapticService?.Selection();
             StartMove();
         }
     }
@@ -365,6 +369,7 @@ public class BoxController : MonoBehaviour, IBox
         var moves = _gridService.RemoveAndShift(cell, shiftDir);
         _productViewService?.ApplyShiftMoves(moves);
         _sfxService?.Play(SfxId.ProductCollect);
+        _hapticService?.LightImpact();
         _currentLoad++;
         PlayCollectScaleFeedback();
 
@@ -461,6 +466,7 @@ public class BoxController : MonoBehaviour, IBox
     {
         // Artık aynı renk product kalmadı → kutu kapanmalı
         _sfxService?.Play(SfxId.BoxDepleted);
+        _hapticService?.Warning();
         _state = BoxState.Destroyed;
         ReleaseBenchSlotIfAny();
 
@@ -561,6 +567,7 @@ public class BoxController : MonoBehaviour, IBox
     private void OnBoxFull()
     {
         _sfxService?.Play(SfxId.BoxFull);
+        _hapticService?.HeavyImpact();
         _state = BoxState.Destroyed;
         ReleaseBenchSlotIfAny();
 
