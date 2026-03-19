@@ -1,4 +1,5 @@
 using System.Text;
+using System.Collections;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -22,17 +23,24 @@ public class UIManager : MonoBehaviour
 
     [Header("Options")]
     public bool autoRefreshRemainingEachFrame = true;
+    [SerializeField] private float uiClickActionDelay = 0.08f;
 
     private IGridService _gridService;
     private IGameStateService _gameState;
     private ILevelFlowService _levelFlow;
+    private ISfxService _sfxService;
 
     [Inject]
-    public void Construct(IGridService gridService, IGameStateService gameState, ILevelFlowService levelFlow)
+    public void Construct(
+        IGridService gridService,
+        IGameStateService gameState,
+        ILevelFlowService levelFlow,
+        [InjectOptional] ISfxService sfxService)
     {
         _gridService = gridService;
         _gameState = gameState;
         _levelFlow = levelFlow;
+        _sfxService = sfxService;
     }
 
     private void Awake()
@@ -136,12 +144,24 @@ public class UIManager : MonoBehaviour
 
     private void OnRetryClicked()
     {
-        _levelFlow?.RestartLevel();
+        _sfxService?.Play(SfxId.UiClick);
+        StartCoroutine(RunAfterUiClickDelay(() => _levelFlow?.RestartLevel()));
     }
 
     private void OnNextClicked()
     {
-        _levelFlow?.LoadNextLevel();
+        _sfxService?.Play(SfxId.UiClick);
+        StartCoroutine(RunAfterUiClickDelay(() => _levelFlow?.LoadNextLevel()));
+    }
+
+    private IEnumerator RunAfterUiClickDelay(System.Action action)
+    {
+        if (uiClickActionDelay > 0f)
+        {
+            yield return new WaitForSeconds(uiClickActionDelay);
+        }
+
+        action?.Invoke();
     }
 }
 

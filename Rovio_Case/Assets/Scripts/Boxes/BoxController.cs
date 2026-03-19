@@ -45,6 +45,7 @@ public class BoxController : MonoBehaviour, IBox
     private IProductViewService _productViewService;
     private IProductInteractionService _productInteractionService;
     private IGameStateService _gameStateService;
+    private ISfxService _sfxService;
 
     private Vector3 _initialScale;
 
@@ -80,7 +81,8 @@ public class BoxController : MonoBehaviour, IBox
         [InjectOptional] IBenchService benchService,
         [InjectOptional] IProductViewService productViewService,
         [InjectOptional] IProductInteractionService productInteractionService,
-        [InjectOptional] IGameStateService gameStateService)
+        [InjectOptional] IGameStateService gameStateService,
+        [InjectOptional] ISfxService sfxService)
     {
         _gridService = gridService;
         _levelLayout = levelLayout;
@@ -88,6 +90,7 @@ public class BoxController : MonoBehaviour, IBox
         _productViewService = productViewService;
         _productInteractionService = productInteractionService;
         _gameStateService = gameStateService;
+        _sfxService = sfxService;
     }
 
     private void ApplyColorFromPalette()
@@ -208,6 +211,7 @@ public class BoxController : MonoBehaviour, IBox
         if (_state == BoxState.Idle || _state == BoxState.OnBench)
         {
             ReleaseBenchSlotIfAny();
+            _sfxService?.Play(SfxId.BoxClick);
             StartMove();
         }
     }
@@ -348,6 +352,8 @@ public class BoxController : MonoBehaviour, IBox
             var moves = _gridService.RemoveAndShift(cell, shiftDir);
             _productViewService?.ApplyShiftMoves(moves);
         }
+
+        _sfxService?.Play(SfxId.ProductCollect);
         _currentLoad++;
 
         if (_gridService.AreAllProductsCollected())
@@ -391,6 +397,7 @@ public class BoxController : MonoBehaviour, IBox
     private void DeactivateBecauseColorDepleted()
     {
         // Artık aynı renk product kalmadı → kutu kapanmalı
+        _sfxService?.Play(SfxId.BoxDepleted);
         _state = BoxState.Destroyed;
         ReleaseBenchSlotIfAny();
 
@@ -490,6 +497,7 @@ public class BoxController : MonoBehaviour, IBox
 
     private void OnBoxFull()
     {
+        _sfxService?.Play(SfxId.BoxFull);
         _state = BoxState.Destroyed;
         ReleaseBenchSlotIfAny();
 
@@ -569,6 +577,7 @@ public class BoxController : MonoBehaviour, IBox
         if (!_benchService.TryReserveSlot(out _reservedBenchSlot) || _reservedBenchSlot == null)
         {
             Debug.LogError("BENCH FULL -> Level Fail (placeholder)");
+            _sfxService?.Play(SfxId.LevelFail);
             _gameStateService?.SetLevelFail();
             _state = BoxState.OnBench;
             return;
@@ -580,9 +589,11 @@ public class BoxController : MonoBehaviour, IBox
         transform
             .DOMove(_reservedBenchSlot.position, 0.25f)
             .SetEase(Ease.OutQuad)
-            .SetLink(gameObject, LinkBehaviour.KillOnDisable);
+            .SetLink(gameObject, LinkBehaviour.KillOnDisable)
+            .OnComplete(() => _sfxService?.Play(SfxId.BenchSit));
 #else
         transform.position = _reservedBenchSlot.position;
+        _sfxService?.Play(SfxId.BenchSit);
 #endif
     }
 }

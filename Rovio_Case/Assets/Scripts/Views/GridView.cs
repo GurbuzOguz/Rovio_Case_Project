@@ -33,7 +33,10 @@ public class GridView : MonoBehaviour
     private Vector3 _productInitialScale = Vector3.one;
 
     [Inject]
-    public void Construct(IGridService gridService, LevelLayout levelLayout, [InjectOptional] IProductViewService productViewService)
+    public void Construct(
+        IGridService gridService,
+        LevelLayout levelLayout,
+        [InjectOptional] IProductViewService productViewService)
     {
         _gridService = gridService;
         _levelLayout = levelLayout;

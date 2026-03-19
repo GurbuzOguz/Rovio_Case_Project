@@ -10,6 +10,10 @@ public class SceneServicesInstaller : MonoInstaller
     [Header("Game Flow (Optional)")]
     [SerializeField] private LevelSequenceConfig levelSequence;
 
+    [Header("SFX")]
+    [SerializeField] private SfxLibrary sfxLibrary;
+    [SerializeField] private int sfxPoolSize = 10;
+
     public override void InstallBindings()
     {
         // Game state / flow (bind once)
@@ -34,6 +38,22 @@ public class SceneServicesInstaller : MonoInstaller
             // Win detector: polls AreAllProductsCollected
             Container.BindInterfacesTo<LevelEndTickable>().AsSingle();
         }
+
+        // SFX service (2D, overlapping via AudioSource pool)
+        if (!Container.HasBinding<ISfxService>())
+        {
+            var go = new GameObject("SfxService");
+            var sfxService = go.AddComponent<SfxService>();
+            sfxService.Initialize(sfxLibrary, sfxPoolSize);
+            Container.Bind<ISfxService>().FromInstance(sfxService).AsSingle();
+
+            // Listen win/fail -> play end sound
+            Container.Bind<LevelEndSfxListener>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<GameStartSfxInitializer>().AsSingle().NonLazy();
+        }
+
+        // Camera shake service (position shake via Cinemachine noise)
+        // (Camera shake disabled by request)
 
         if (productViewService != null)
         {
