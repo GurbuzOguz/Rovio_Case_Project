@@ -12,6 +12,6 @@ public class BoxConfig : ScriptableObject
 
     [Header("Movement")]
     [Min(0.1f)]
-    public float moveSpeed = 3f;
+    public float moveSpeed = 12f;
 }
 

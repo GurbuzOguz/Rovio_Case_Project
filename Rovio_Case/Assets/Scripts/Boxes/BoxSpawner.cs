@@ -21,18 +21,20 @@ public class BoxSpawner : MonoBehaviour
     private LevelLayout _levelLayout;
     private GridConfig _gridConfig;
     private IGridService _gridService;
+    private ISfxService _sfxService;
     private readonly List<BoxController> _activeBoxes = new List<BoxController>();
     private readonly List<BoxConfig> _runtimeGeneratedConfigs = new List<BoxConfig>();
 
     public IReadOnlyList<BoxController> ActiveBoxes => _activeBoxes;
 
     [Inject]
-    public void Construct(LevelLayout levelLayout, GridConfig gridConfig, IGridService gridService, DiContainer container)
+    public void Construct(LevelLayout levelLayout, GridConfig gridConfig, IGridService gridService, DiContainer container, ISfxService sfxService)
     {
         _levelLayout = levelLayout;
         _gridConfig = gridConfig;
         _gridService = gridService;
         _container = container;
+        _sfxService = sfxService;
     }
 
     private void Awake()
@@ -48,6 +50,7 @@ public class BoxSpawner : MonoBehaviour
     private void Start()
     {
         SpawnInitialBoxes();
+        _sfxService?.Play(SfxId.ProductSpawn);
     }
 
     private void SpawnInitialBoxes()

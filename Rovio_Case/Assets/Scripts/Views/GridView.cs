@@ -134,7 +134,10 @@ public class GridView : MonoBehaviour
 
 #if DOTWEEN_EXISTS || true
                 tile.transform.localScale = Vector3.zero;
-                tile.transform.DOScale(_tileInitialScale, tileScaleDuration).SetEase(Ease.OutBounce);
+                tile.transform
+                    .DOScale(_tileInitialScale, tileScaleDuration)
+                    .SetEase(Ease.OutBounce)
+                    .SetLink(tile.gameObject, LinkBehaviour.KillOnDestroy);
 #endif
             }
         }
@@ -227,7 +230,8 @@ public class GridView : MonoBehaviour
                 product.transform
                     .DOScale(_productInitialScale, productScaleDuration)
                     .SetEase(Ease.OutBack)
-                    .SetDelay(delay);
+                    .SetDelay(delay)
+                    .SetLink(product.gameObject, LinkBehaviour.KillOnDestroy);
 #endif
 
                 spawnedCount++;

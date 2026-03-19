@@ -10,5 +10,7 @@ public enum SfxId
     BenchSit,
     LevelComplete,
     LevelFail,
+    ProductSpawn,
+
 }
 

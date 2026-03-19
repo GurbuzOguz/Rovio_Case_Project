@@ -52,9 +52,6 @@ public class SceneServicesInstaller : MonoInstaller
             Container.BindInterfacesTo<GameStartSfxInitializer>().AsSingle().NonLazy();
         }
 
-        // Camera shake service (position shake via Cinemachine noise)
-        // (Camera shake disabled by request)
-
         if (productViewService != null)
         {
             Container.Bind<IProductViewService>().FromInstance(productViewService).AsSingle();

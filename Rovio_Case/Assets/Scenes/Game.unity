@@ -656,7 +656,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fdf67db7fea97340822c7c66033ef9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SfxService
-  defaultPoolSize: 8
+  defaultPoolSize: 12
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -721,7 +721,7 @@ Camera:
   far clip plane: 1000
   field of view: 60.000004
   orthographic: 1
-  orthographic size: 23.6
+  orthographic size: 35
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1267,6 +1267,7 @@ MonoBehaviour:
   retryButton: {fileID: 1179117252}
   nextButton: {fileID: 1328466070}
   autoRefreshRemainingEachFrame: 1
+  uiClickActionDelay: 0.08
 --- !u!1 &511454097
 GameObject:
   m_ObjectHideFlags: 0
@@ -1575,7 +1576,7 @@ MonoBehaviour:
   productPrefab: {fileID: 7086390040467078375, guid: 88f05117ca769c64e9f7c3a5aa8b0a87, type: 3}
   productHeightOffset: 0.1
   productScaleDuration: 0.2
-  productSpawnDelay: 0.02
+  productSpawnDelay: 0.01
   productsParent: {fileID: 26835654}
 --- !u!114 &597910221
 MonoBehaviour:
@@ -3161,7 +3162,7 @@ MonoBehaviour:
   - {fileID: 443111817}
   - {fileID: 1436566337}
   defaultBoxCapacity: 9
-  defaultBoxMoveSpeed: 7
+  defaultBoxMoveSpeed: 12
   queueShiftDuration: 0.2
   queueRowSize: 3
 --- !u!1 &1789042022
@@ -3360,6 +3361,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2097998305}
   - component: {fileID: 2097998304}
+  - component: {fileID: 2097998306}
   m_Layer: 0
   m_Name: CinemachineCamera
   m_TagString: Untagged
@@ -3392,7 +3394,7 @@ MonoBehaviour:
     CustomLookAtTarget: 0
   Lens:
     FieldOfView: 60.000004
-    OrthographicSize: 23.6
+    OrthographicSize: 35
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -3426,6 +3428,19 @@ Transform:
   - {fileID: 330585546}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &2097998306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2097998303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89b24826688c4ef4a9ed9416b04c7956, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraMovement
+  virtualCamera: {fileID: 2097998304}
 --- !u!1001 &2123245056
 PrefabInstance:
   m_ObjectHideFlags: 0

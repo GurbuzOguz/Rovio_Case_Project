@@ -21,7 +21,7 @@ public class BoxController : MonoBehaviour, IBox
     [SerializeField] private BoxPath path;
 
     [Header("Movement Override")]
-    [SerializeField] private float defaultMoveSpeed = 3f;
+    [SerializeField] private float defaultMoveSpeed = 12f;
 
     [Header("Visuals")]
     [SerializeField] private Color defaultBoxColor = Color.white;
@@ -337,7 +337,7 @@ public class BoxController : MonoBehaviour, IBox
         var shiftDir = DetermineShiftDirection(pos);
 
         // Atomik tüketim + shift (aynı anda iki box çakışmasın)
-        if (_productInteractionService != null)
+        /*if (_productInteractionService != null)
         {
             bool started = _productInteractionService.TryConsumeAndShift(cell, transform, shiftDir);
             if (!started)
@@ -352,6 +352,10 @@ public class BoxController : MonoBehaviour, IBox
             var moves = _gridService.RemoveAndShift(cell, shiftDir);
             _productViewService?.ApplyShiftMoves(moves);
         }
+*/
+            _productViewService?.TryConsumeAndPullToBox(cell, transform);
+            var moves = _gridService.RemoveAndShift(cell, shiftDir);
+            _productViewService?.ApplyShiftMoves(moves);
 
         _sfxService?.Play(SfxId.ProductCollect);
         _currentLoad++;
