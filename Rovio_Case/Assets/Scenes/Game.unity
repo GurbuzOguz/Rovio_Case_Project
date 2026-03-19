@@ -612,6 +612,7 @@ MonoBehaviour:
   levelSequence: {fileID: 11400000, guid: fdc9e0e89f170e849b6b635ef677f1f0, type: 2}
   sfxLibrary: {fileID: 11400000, guid: 19300e75d97b82949a733dae2f0d58b5, type: 2}
   sfxPoolSize: 10
+  particleLibrary: {fileID: 11400000, guid: 5db7b5d3c41a7e34caab6e2f3f222d4b, type: 2}
 --- !u!1 &234609370
 GameObject:
   m_ObjectHideFlags: 0

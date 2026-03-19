@@ -53,6 +53,7 @@ public class BoxController : MonoBehaviour, IBox
     private IGameStateService _gameStateService;
     private ISfxService _sfxService;
     private IHapticService _hapticService;
+    private IParticleService _particleService;
 
     private Vector3 _initialScale;
 
@@ -93,7 +94,8 @@ public class BoxController : MonoBehaviour, IBox
         [InjectOptional] IProductInteractionService productInteractionService,
         [InjectOptional] IGameStateService gameStateService,
         [InjectOptional] ISfxService sfxService,
-        [InjectOptional] IHapticService hapticService)
+        [InjectOptional] IHapticService hapticService,
+        [InjectOptional] IParticleService particleService)
     {
         _gridService = gridService;
         _levelLayout = levelLayout;
@@ -103,6 +105,7 @@ public class BoxController : MonoBehaviour, IBox
         _gameStateService = gameStateService;
         _sfxService = sfxService;
         _hapticService = hapticService;
+        _particleService = particleService;
     }
 
     private void ApplyColorFromPalette()
@@ -242,6 +245,7 @@ public class BoxController : MonoBehaviour, IBox
             ReleaseBenchSlotIfAny();
             _sfxService?.Play(SfxId.BoxClick);
             _hapticService?.Selection();
+            _particleService?.PlayAttached(ParticleId.BoxClick, transform);
             StartMove();
         }
     }
@@ -370,6 +374,7 @@ public class BoxController : MonoBehaviour, IBox
         _productViewService?.ApplyShiftMoves(moves);
         _sfxService?.Play(SfxId.ProductCollect);
         _hapticService?.LightImpact();
+        _particleService?.Play(ParticleId.ProductCollect, cellWorld);
         _currentLoad++;
         PlayCollectScaleFeedback();
 
@@ -467,6 +472,7 @@ public class BoxController : MonoBehaviour, IBox
         // Artık aynı renk product kalmadı → kutu kapanmalı
         _sfxService?.Play(SfxId.BoxDepleted);
         _hapticService?.Warning();
+        _particleService?.PlayAttached(ParticleId.BoxDepleted, transform);
         _state = BoxState.Destroyed;
         ReleaseBenchSlotIfAny();
 
@@ -568,6 +574,7 @@ public class BoxController : MonoBehaviour, IBox
     {
         _sfxService?.Play(SfxId.BoxFull);
         _hapticService?.HeavyImpact();
+        _particleService?.PlayAttached(ParticleId.BoxFull, transform);
         _state = BoxState.Destroyed;
         ReleaseBenchSlotIfAny();
 
@@ -659,10 +666,15 @@ public class BoxController : MonoBehaviour, IBox
             .DOMove(_reservedBenchSlot.position, 0.25f)
             .SetEase(Ease.OutQuad)
             .SetLink(gameObject, LinkBehaviour.KillOnDisable)
-            .OnComplete(() => _sfxService?.Play(SfxId.BenchSit));
+            .OnComplete(() =>
+            {
+                _sfxService?.Play(SfxId.BenchSit);
+                _particleService?.Play(ParticleId.BenchSit, _reservedBenchSlot.position);
+            });
 #else
         transform.position = _reservedBenchSlot.position;
         _sfxService?.Play(SfxId.BenchSit);
+        _particleService?.Play(ParticleId.BenchSit, _reservedBenchSlot.position);
 #endif
     }
 }

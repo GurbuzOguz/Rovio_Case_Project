@@ -14,6 +14,9 @@ public class SceneServicesInstaller : MonoInstaller
     [SerializeField] private SfxLibrary sfxLibrary;
     [SerializeField] private int sfxPoolSize = 10;
 
+    [Header("Particles")]
+    [SerializeField] private ParticleLibrary particleLibrary;
+
     public override void InstallBindings()
     {
         // Game state / flow (bind once)
@@ -36,6 +39,14 @@ public class SceneServicesInstaller : MonoInstaller
         if (!Container.HasBinding<IHapticService>())
         {
             Container.Bind<IHapticService>().To<HapticService>().AsSingle();
+        }
+
+        if (!Container.HasBinding<IParticleService>())
+        {
+            var go = new GameObject("ParticleService");
+            var particleService = go.AddComponent<ParticleService>();
+            particleService.Initialize(particleLibrary);
+            Container.Bind<IParticleService>().FromInstance(particleService).AsSingle();
         }
 
         if (!Container.HasBinding<Zenject.ITickable>())
