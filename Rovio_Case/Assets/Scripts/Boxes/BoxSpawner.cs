@@ -1,10 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Zenject;
-#if DOTWEEN_EXISTS || true
-using DG.Tweening;
-#endif
 
 public class BoxSpawner : MonoBehaviour
 {
@@ -23,7 +19,11 @@ public class BoxSpawner : MonoBehaviour
     private IGridService _gridService;
     private ISfxService _sfxService;
     private readonly List<BoxController> _activeBoxes = new List<BoxController>();
+    private readonly HashSet<BoxController> _knownBoxes = new HashSet<BoxController>();
     private readonly List<BoxConfig> _runtimeGeneratedConfigs = new List<BoxConfig>();
+    private IBoxFactory _boxFactory;
+    private IBoxQueueService _queueService;
+    private IBoxSpawnPolicy _spawnPolicy;
 
     public IReadOnlyList<BoxController> ActiveBoxes => _activeBoxes;
 
@@ -39,6 +39,10 @@ public class BoxSpawner : MonoBehaviour
 
     private void Awake()
     {
+        _boxFactory = new BoxFactory(_container);
+        _queueService = new BoxQueueService();
+        _spawnPolicy = new NeedBasedBoxSpawnPolicy();
+
         if (boxesParent == null)
         {
             var parentGo = new GameObject("Boxes");
@@ -93,27 +97,18 @@ public class BoxSpawner : MonoBehaviour
 
     private void SpawnBoxAtSlot(int slotIndex, BoxConfig config)
     {
-        Transform spawnPoint = spawnPoints[slotIndex];
-        Vector3 spawnPosition = spawnPoint != null ? spawnPoint.position : Vector3.zero;
-
-        var boxGo = _container != null
-            ? _container.InstantiatePrefab(boxPrefab, spawnPosition, Quaternion.identity, boxesParent)
-            : Object.Instantiate(boxPrefab, spawnPosition, Quaternion.identity, boxesParent);
-        boxGo.name = $"Box_{slotIndex}";
-
-        var controller = boxGo.GetComponent<BoxController>();
+        var controller = _boxFactory != null
+            ? _boxFactory.SpawnAtSlot(slotIndex, config, boxPrefab, boxesParent, spawnPoints, _levelLayout, _gridConfig)
+            : null;
         if (controller == null)
         {
             Debug.LogError("BoxSpawner: Box prefab does not have a BoxController component.");
-            Destroy(boxGo);
             return;
         }
 
-        BoxPath sharedPath = _gridConfig != null ? _gridConfig.boxPath : null;
-        controller.Initialize(config, sharedPath, _levelLayout != null ? _levelLayout.productPalette : null);
-
         EnsureActiveBoxesSize();
         _activeBoxes[slotIndex] = controller;
+        _knownBoxes.Add(controller);
 
         controller.StartedMovingFromQueue += HandleBoxStartedMovingFromQueue;
         controller.BecameInactive += HandleBoxBecameInactive;
@@ -140,7 +135,7 @@ public class BoxSpawner : MonoBehaviour
         _activeBoxes[slotIndex] = null;
 
         // Arkadakiler öne kay (3'erli satır düzeninde aynı sütun)
-        ShiftQueueForwardInColumn(slotIndex);
+        _queueService?.ShiftQueueForwardInColumn(_activeBoxes, spawnPoints, queueRowSize, queueShiftDuration, slotIndex);
 
         // En arkaya yeni kutu (gerekliyse)
         TrySpawnBoxAtBackIfNeeded(slotIndex);
@@ -156,63 +151,6 @@ public class BoxSpawner : MonoBehaviour
         }
     }
 
-    private void ShiftQueueForwardInColumn(int fromIndex)
-    {
-        EnsureActiveBoxesSize();
-
-        if (queueRowSize <= 0)
-        {
-            queueRowSize = 1;
-        }
-
-        int totalSlots = spawnPoints.Count;
-        int rowCount = Mathf.CeilToInt(totalSlots / (float)queueRowSize);
-
-        int col = fromIndex % queueRowSize;
-        int row = fromIndex / queueRowSize;
-
-        // row0 = ön, rowCount-1 = arka; sadece arkadakileri öne kaydır
-        for (int r = row + 1; r < rowCount; r++)
-        {
-            int srcIndex = r * queueRowSize + col;
-            int dstIndex = (r - 1) * queueRowSize + col;
-
-            if (srcIndex >= totalSlots || dstIndex >= totalSlots)
-            {
-                continue;
-            }
-
-            var b = _activeBoxes[srcIndex];
-            if (b == null)
-            {
-                continue;
-            }
-
-            if (b.State != BoxState.Idle)
-            {
-                continue;
-            }
-
-            Transform targetSlot = spawnPoints[dstIndex];
-            if (targetSlot == null)
-            {
-                continue;
-            }
-
-#if DOTWEEN_EXISTS || true
-            b.transform
-                .DOMove(targetSlot.position, queueShiftDuration)
-                .SetEase(Ease.OutQuad)
-                .SetLink(b.gameObject, LinkBehaviour.KillOnDisable);
-#else
-            b.transform.position = targetSlot.position;
-#endif
-
-            _activeBoxes[dstIndex] = b;
-            _activeBoxes[srcIndex] = null;
-        }
-    }
-
     private void TrySpawnBoxAtBackIfNeeded(int fromIndex)
     {
         if (spawnPoints.Count == 0)
@@ -220,19 +158,12 @@ public class BoxSpawner : MonoBehaviour
             return;
         }
 
-        if (queueRowSize <= 0)
+        int backIndex = _queueService != null
+            ? _queueService.GetBackIndex(spawnPoints, queueRowSize, fromIndex)
+            : -1;
+        if (backIndex < 0)
         {
-            queueRowSize = 1;
-        }
-
-        int totalSlots = spawnPoints.Count;
-        int rowCount = Mathf.CeilToInt(totalSlots / (float)queueRowSize);
-        int col = fromIndex % queueRowSize;
-        int backIndex = (rowCount - 1) * queueRowSize + col;
-        if (backIndex < 0 || backIndex >= totalSlots)
-        {
-            // fallback: son slot
-            backIndex = totalSlots - 1;
+            return;
         }
 
         EnsureActiveBoxesSize();
@@ -254,7 +185,9 @@ public class BoxSpawner : MonoBehaviour
             return;
         }
 
-        int chosenColorId = ChooseNextColorIdToSpawn(remaining);
+        int chosenColorId = _spawnPolicy != null
+            ? _spawnPolicy.ChooseNextColorIdToSpawn(remaining, _knownBoxes)
+            : -1;
         if (chosenColorId < 0)
         {
             return;
@@ -268,50 +201,6 @@ public class BoxSpawner : MonoBehaviour
         _runtimeGeneratedConfigs.Add(cfg);
 
         SpawnBoxAtSlot(backIndex, cfg);
-    }
-
-    private int ChooseNextColorIdToSpawn(IReadOnlyDictionary<int, int> remaining)
-    {
-        // Mevcut kutuların o renk için kalan kapasite toplamını hesapla (queue + moving + bench)
-        // Not: burada sahnedeki tüm BoxController'ları tarıyoruz ama sadece spawn anında (seyrek).
-        // Spawn anında seyrek çağrılır, toplam box sayısı küçük (9 + bench) olduğu için acceptable.
-        var allBoxes = Object.FindObjectsByType<BoxController>(FindObjectsSortMode.None);
-
-        int bestColor = -1;
-        int bestNeed = 0;
-
-        foreach (var kv in remaining)
-        {
-            int colorId = kv.Key;
-            int remainingCount = kv.Value;
-
-            int capacityCoverage = 0;
-            for (int i = 0; i < allBoxes.Length; i++)
-            {
-                var b = allBoxes[i];
-                if (b == null)
-                {
-                    continue;
-                }
-
-                if (b.ColorId != colorId)
-                {
-                    continue;
-                }
-
-                capacityCoverage += Mathf.Max(0, b.Capacity - b.CurrentLoad);
-            }
-
-            int need = remainingCount - capacityCoverage;
-            if (need > bestNeed)
-            {
-                bestNeed = need;
-                bestColor = colorId;
-            }
-        }
-
-        // need <= 0 ise hiçbir renge yeni kutu gerekmiyor
-        return bestNeed > 0 ? bestColor : -1;
     }
 
     private BoxConfig GetOrCreateConfigForIndex(int index, LevelLayout levelLayout)
