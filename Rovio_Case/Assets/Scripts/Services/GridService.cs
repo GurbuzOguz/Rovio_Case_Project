@@ -6,7 +6,7 @@ public class GridService : IGridService
     private readonly GridConfig _gridConfig;
     private readonly LevelLayout _levelLayout;
 
-    // colorId -> int
+    // Cell -> colorId
     private readonly Dictionary<Vector2Int, int> _products =
         new Dictionary<Vector2Int, int>();
 
@@ -132,7 +132,7 @@ public class GridService : IGridService
         Vector2Int bestCell = default;
         bool found = false;
 
-        // Aynı renk için, hizalı sütun/satır üzerindeki productları tara.
+        // Search aligned row/column cells for the same color.
         foreach (var kvp in _products)
         {
             if (kvp.Value != query.ColorId)
@@ -144,7 +144,7 @@ public class GridService : IGridService
             bool matchesColumn = columnAligned && c.x == alignment.nearestColumn;
             bool matchesRow = rowAligned && c.y == alignment.nearestRow;
 
-            // İki hizalamadan en az birine uymalı
+            // Must match at least one alignment axis.
             if (!matchesColumn && !matchesRow)
             {
                 continue;
@@ -192,7 +192,7 @@ public class GridService : IGridService
 
     public IReadOnlyDictionary<int, int> GetRemainingCountsByColorId()
     {
-        // snapshot; caller modify edemesin
+        // Return a snapshot so caller cannot mutate internal state.
         var counts = new Dictionary<int, int>();
         foreach (var kvp in _products)
         {
@@ -215,19 +215,19 @@ public class GridService : IGridService
 
         if (!_products.ContainsKey(removedCell))
         {
-            // Zaten boş olabilir
+            // Cell can already be empty
             return moves;
         }
 
-        // Önce kaldır
+        // Remove first
         _products.Remove(removedCell);
 
-        // Direction'a göre aynı satır veya sütunda kaydır.
-        // Grid'i ortadan bölerek shift ediyoruz:
-        // - Left/Right: sadece sol yarı veya sağ yarı
-        // - Down/Up: sadece alt yarı veya üst yarı
-        int midCol = (Columns - 1) / 2; // sol yarı: [0..midCol], sağ yarı: [midCol+1..Columns-1]
-        int midRow = (Rows - 1) / 2;    // alt yarı: [0..midRow], üst yarı: [midRow+1..Rows-1]
+        // Shift along row/column based on direction.
+        // Split grid into halves:
+        // - Left/Right: left or right half
+        // - Down/Up: bottom or top half
+        int midCol = (Columns - 1) / 2; // left: [0..midCol], right: [midCol+1..Columns-1]
+        int midRow = (Rows - 1) / 2;    // bottom: [0..midRow], top: [midRow+1..Rows-1]
 
         switch (direction)
         {
@@ -260,7 +260,7 @@ public class GridService : IGridService
         int midCol = (Columns - 1) / 2;
         int midRow = (Rows - 1) / 2;
 
-        // Sol yarı: sol edge boşluklarını doldur
+        // Left half: fill left edge gaps
         for (int y = 0; y < Rows; y++)
         {
             var edge = new Vector2Int(0, y);
@@ -270,7 +270,7 @@ public class GridService : IGridService
             }
         }
 
-        // Sağ yarı: sağ edge boşluklarını doldur
+        // Right half: fill right edge gaps
         for (int y = 0; y < Rows; y++)
         {
             var edge = new Vector2Int(Columns - 1, y);
@@ -280,7 +280,7 @@ public class GridService : IGridService
             }
         }
 
-        // Alt yarı: alt edge boşluklarını doldur
+        // Bottom half: fill bottom edge gaps
         for (int x = 0; x < Columns; x++)
         {
             var edge = new Vector2Int(x, 0);
@@ -290,7 +290,7 @@ public class GridService : IGridService
             }
         }
 
-        // Üst yarı: üst edge boşluklarını doldur
+        // Top half: fill top edge gaps
         for (int x = 0; x < Columns; x++)
         {
             var edge = new Vector2Int(x, Rows - 1);
@@ -321,7 +321,7 @@ public class GridService : IGridService
                 continue;
             }
 
-            // Sağa doğru ilk dolu hücreyi bul
+            // Find first occupied cell to the right
             for (int sx = x + 1; sx <= xEnd; sx++)
             {
                 var src = new Vector2Int(sx, row);
@@ -354,7 +354,7 @@ public class GridService : IGridService
                 continue;
             }
 
-            // Sola doğru ilk dolu hücreyi bul
+            // Find first occupied cell to the left
             for (int sx = x - 1; sx >= xStart; sx--)
             {
                 var src = new Vector2Int(sx, row);

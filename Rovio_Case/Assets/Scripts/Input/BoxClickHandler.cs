@@ -53,7 +53,7 @@ public class BoxClickHandler : MonoBehaviour
 #if ENABLE_INPUT_SYSTEM
     private bool TryGetClickedBox(Ray ray, out BoxController box)
     {
-        // Tek hit yerine tüm hit'leri tarıyoruz; önde başka collider olsa da arkadaki box bulunabilsin.
+        // Scan all hits so a front collider does not hide a box behind it.
         var hits = Physics.RaycastAll(ray, raycastMaxDistance, boxLayerMask, QueryTriggerInteraction.Ignore);
         if (hits == null || hits.Length == 0)
         {
@@ -80,7 +80,7 @@ public class BoxClickHandler : MonoBehaviour
 
     private bool TryGetPointerDownScreenPosition(out Vector2 screenPos)
     {
-        // Device simulator/mobile için touch öncelikli.
+        // Prioritize touch for device simulator/mobile.
         var touch = UnityEngine.InputSystem.Touchscreen.current;
         if (touch != null && touch.primaryTouch.press.wasPressedThisFrame)
         {

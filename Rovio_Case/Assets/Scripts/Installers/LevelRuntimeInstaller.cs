@@ -24,7 +24,6 @@ public class LevelRuntimeInstaller : MonoInstaller
             var chosenGrid = chosenLayout != null && chosenLayout.gridConfig != null ? chosenLayout.gridConfig : fallbackGridConfig;
             if (chosenGrid == null)
             {
-                Debug.LogError("LevelRuntimeInstaller: GridConfig missing. Assign fallbackGridConfig or set it on LevelLayout.");
                 chosenGrid = ScriptableObject.CreateInstance<GridConfig>();
             }
             Container.Bind<GridConfig>().FromInstance(chosenGrid).AsSingle();
@@ -54,7 +53,6 @@ public class LevelRuntimeInstaller : MonoInstaller
             return fallbackLevelLayout;
         }
 
-        Debug.LogError("LevelRuntimeInstaller: No LevelLayout assigned/found.");
         return ScriptableObject.CreateInstance<LevelLayout>();
     }
 }

@@ -8,7 +8,7 @@ public class BoxFeedbackModule : MonoBehaviour, IBoxFeedbackModule
     [Header("Visuals")]
     [SerializeField] private bool playSpawnAnimation = true;
     [SerializeField] private float spawnScaleDuration = 0.25f;
-    [Tooltip("Scale animasyonu icin gorsel root. Collider olan root'u scale etmeyin.")]
+    [Tooltip("Visual root for scale animation. Avoid scaling the collider root.")]
     [SerializeField] private Transform visualRoot;
 
     [Header("Collect Feedback")]

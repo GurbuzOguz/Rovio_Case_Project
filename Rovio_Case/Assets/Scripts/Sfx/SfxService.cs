@@ -34,7 +34,7 @@ public class SfxService : MonoBehaviour, ISfxService
                     continue;
                 }
 
-                // Son tanım override eder (istersen ilk tanımda bırakırız)
+                // Last definition wins (can be changed to keep first)
                 _map[e.id] = e;
             }
         }
@@ -44,11 +44,6 @@ public class SfxService : MonoBehaviour, ISfxService
         if (_library == null && !_loggedLibraryNull)
         {
             _loggedLibraryNull = true;
-            Debug.LogWarning("SfxService: SfxLibrary is null. No SFX will play until you assign one in SceneServicesInstaller.");
-        }
-        else if (_library != null && _map.Count == 0)
-        {
-            Debug.LogWarning("SfxService: SfxLibrary has no valid entries (entries null/empty or missing ids/clips). Assign clips for SfxId values.");
         }
     }
 
@@ -64,7 +59,6 @@ public class SfxService : MonoBehaviour, ISfxService
             if (!_missingIdsLogged.Contains(id))
             {
                 _missingIdsLogged.Add(id);
-                Debug.LogWarning($"SfxService: Missing AudioClip for id={id}. Add it to SfxLibrary entries.");
             }
             return;
         }
@@ -80,7 +74,7 @@ public class SfxService : MonoBehaviour, ISfxService
 
     public void PlayAt(SfxId id, Vector3 position)
     {
-        // 3D istemiyorsun -> spatialBlend 0; yine de basitçe aynı şekilde çalıyoruz.
+        // 3D not needed -> spatialBlend 0; keep playback path simple.
         Play(id);
     }
 
@@ -96,7 +90,6 @@ public class SfxService : MonoBehaviour, ISfxService
             if (!_missingIdsLogged.Contains(id))
             {
                 _missingIdsLogged.Add(id);
-                Debug.LogWarning($"SfxService: Missing AudioClip for id={id}. Add it to SfxLibrary entries.");
             }
             return;
         }
@@ -140,7 +133,7 @@ public class SfxService : MonoBehaviour, ISfxService
 
     private void EnsurePool()
     {
-        // Aynı sahnede tekrar Initialize olursa pool'ü yeniden oluşturma
+        // Do not recreate pool if Initialize is called again in the same scene
         if (_pool.Count > 0)
         {
             return;

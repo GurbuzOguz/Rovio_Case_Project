@@ -15,7 +15,7 @@ public class GridConfig : ScriptableObject
     public Vector3 origin = Vector3.zero;
 
     [Header("Box Path")]
-    [Tooltip("Box'ların takip edeceği ortak path referansı. Scene'deki bir BoxPath component'i atanabilir.")]
+    [Tooltip("Shared path reference used by boxes. Assign a BoxPath component from the scene.")]
     public BoxPath boxPath;
 }
 

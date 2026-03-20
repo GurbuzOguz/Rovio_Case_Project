@@ -10,7 +10,7 @@ public class BoxSpawner : MonoBehaviour
     [SerializeField] private int defaultBoxCapacity = 3;
     [SerializeField] private float defaultBoxMoveSpeed = 3f;
     [SerializeField] private float queueShiftDuration = 0.2f;
-    [Tooltip("Kuyruk slotları kaçarlı satır? Örn 3 => 3x3 düzen. spawnPoints sırası: önce ön satır (0..rowSize-1), sonra orta, sonra arka.")]
+    [Tooltip("How many slots per queue row? E.g. 3 => 3x3 layout. spawnPoints order: front row first, then middle, then back.")]
     [SerializeField] private int queueRowSize = 3;
 
     private DiContainer _container;
@@ -61,13 +61,11 @@ public class BoxSpawner : MonoBehaviour
     {
         if (_levelLayout == null)
         {
-            Debug.LogError("BoxSpawner: LevelLayout not injected.");
             return;
         }
 
         if (boxPrefab == null)
         {
-            Debug.LogError("BoxSpawner: Box prefab not assigned.");
             return;
         }
 
@@ -80,7 +78,6 @@ public class BoxSpawner : MonoBehaviour
 
         if (maxBoxes <= 0)
         {
-            Debug.LogWarning("BoxSpawner: maxBoxes is 0. Check LevelLayout.initialBoxConfigs and BoxSpawner.spawnPoints.");
             return;
         }
 
@@ -97,7 +94,6 @@ public class BoxSpawner : MonoBehaviour
             : null;
         if (controller == null)
         {
-            Debug.LogError("BoxSpawner: Box prefab does not have a BoxController component.");
             return;
         }
 
@@ -111,7 +107,7 @@ public class BoxSpawner : MonoBehaviour
 
     private void EnsureActiveBoxesSize()
     {
-        // queue slot sayısı kadar listeyi büyüt
+        // Expand list to match queue slot count
         while (_activeBoxes.Count < spawnPoints.Count)
         {
             _activeBoxes.Add(null);
@@ -126,19 +122,19 @@ public class BoxSpawner : MonoBehaviour
             return;
         }
 
-        // Slot'u boşalt (box path'e çıktı)
+        // Free the slot (box left queue and entered path)
         _activeBoxes[slotIndex] = null;
 
-        // Arkadakiler öne kay (3'erli satır düzeninde aynı sütun)
+        // Shift boxes forward in the same column
         _queueService?.ShiftQueueForwardInColumn(_activeBoxes, spawnPoints, queueRowSize, queueShiftDuration, slotIndex);
 
-        // En arkaya yeni kutu (gerekliyse)
+        // Spawn a new box at the back when needed
         TrySpawnBoxAtBackIfNeeded(slotIndex);
     }
 
     private void HandleBoxBecameInactive(BoxController box)
     {
-        // Deactivate olan box listede duruyorsa temizle
+        // Clean list entry if a box became inactive
         int idx = _activeBoxes.IndexOf(box);
         if (idx >= 0)
         {
@@ -168,7 +164,7 @@ public class BoxSpawner : MonoBehaviour
             return;
         }
 
-        // Grid'de product kalmadıysa spawn yok
+        // No spawn if there are no products left
         if (_gridService == null)
         {
             return;
@@ -208,7 +204,7 @@ public class BoxSpawner : MonoBehaviour
             return levelLayout.initialBoxConfigs[index];
         }
 
-        // Auto-generate: palette içindeki renklerden sırayla runtime BoxConfig üret
+        // Auto-generate runtime BoxConfig using palette colors in order
         int colorId = GetPaletteColorIdForIndex(index, levelLayout);
 
         var config = ScriptableObject.CreateInstance<BoxConfig>();
@@ -223,8 +219,8 @@ public class BoxSpawner : MonoBehaviour
 
     private int GetPaletteColorIdForIndex(int index, LevelLayout levelLayout)
     {
-        // Oncelik: Grid'de gercekten bulunan renkler.
-        // Boylece hic urunu olmayan renkte kutu spawn olmayip tiklayinca aninda kapanma olmaz.
+        // Priority: colors that actually exist on the grid.
+        // Prevents spawning boxes that would instantly deactivate on click.
         if (_gridService != null)
         {
             var remaining = _gridService.GetRemainingCountsByColorId();
@@ -240,7 +236,7 @@ public class BoxSpawner : MonoBehaviour
         var palette = levelLayout != null ? levelLayout.productPalette : null;
         if (palette == null || palette.entries == null || palette.entries.Count == 0)
         {
-            // Palette yoksa 0 kullan (renk bulunamazsa BoxController defaultBoxColor'a düşer)
+            // Fallback to color 0 when no palette is available
             return 0;
         }
 

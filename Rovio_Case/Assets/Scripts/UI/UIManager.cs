@@ -10,10 +10,10 @@ using DG.Tweening;
 public class UIManager : MonoBehaviour
 {
     [Header("HUD")]
-    [Tooltip("Örn: 'Level 1/3'")]
+    [Tooltip("Example: 'Level 1/3'")]
     public TMP_Text levelText;
 
-    [Tooltip("Örn: 'Remaining: 0:12 1:8 2:4'")]
+    [Tooltip("Example: 'Remaining: 0:12 1:8 2:4'")]
     public TMP_Text remainingText;
 
     [Header("End Screen")]

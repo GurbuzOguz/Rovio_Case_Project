@@ -23,7 +23,7 @@ public class LevelBackgroundColorInitializer : IInitializable
             return;
         }
 
-        // Unity tarafında zaten Solid Color seçili diyorsun ama güvenli yapmak için set ediyoruz.
+        // Force a safe camera clear setup even if already configured as Solid Color.
         cam.clearFlags = CameraClearFlags.SolidColor;
 
         cam.backgroundColor = _levelLayout.backgroundColor;

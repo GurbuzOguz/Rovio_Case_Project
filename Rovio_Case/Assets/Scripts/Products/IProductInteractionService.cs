@@ -3,12 +3,12 @@ using UnityEngine;
 public interface IProductInteractionService
 {
     /// <summary>
-    /// Product tüketimi + shift işlemini atomik yapar. Şu anda başka bir işlem çalışıyorsa false döner.
+    /// Performs product consume + shift atomically. Returns false if another operation is running.
     /// </summary>
     bool TryConsumeAndShift(Vector2Int cell, Transform boxTransform, GridShiftDirection shiftDirection);
 
     /// <summary>
-    /// Edge boşluklarını doldurmak için stabilizasyon uygular (busy ise false).
+    /// Applies stabilization to fill edge gaps (returns false when busy).
     /// </summary>
     bool TryFillEdgeGaps();
 }

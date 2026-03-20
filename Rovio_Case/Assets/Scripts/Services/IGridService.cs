@@ -18,22 +18,22 @@ public interface IGridService
     bool AreAllProductsCollected();
 
     /// <summary>
-    /// Query'e göre hizalı eksendeki en yakın product hücresini bulur.
+    /// Finds the closest product cell aligned with the given query.
     /// </summary>
     bool TryFindClosestAlignedProductCell(AlignedProductQuery query, out Vector2Int cell);
 
-    /// <summary>Grid'de kalan product sayıları (colorId -> count).</summary>
+    /// <summary>Remaining product counts on the grid (colorId -> count).</summary>
     IReadOnlyDictionary<int, int> GetRemainingCountsByColorId();
 
     /// <summary>
-    /// Belirli bir hücreden product kaldırır ve boşluğu, direction yönünde shift ederek doldurur.
-    /// Hem internal data güncellenir hem de hangi hücrelerin nereye kaydığı döndürülür.
+    /// Removes a product from the given cell and fills the gap by shifting in the given direction.
+    /// Updates internal data and returns all shift moves.
     /// </summary>
     List<GridShiftMove> RemoveAndShift(Vector2Int removedCell, GridShiftDirection direction);
 
     /// <summary>
-    /// Edge hücrelerinde boşluk varsa, ilgili yarı içinde ürünleri kaydırarak edge'i doldurur.
-    /// (Remove yok; sadece kaydırma). Yapılan hareketler döndürülür.
+    /// Fills empty edge cells by shifting products in the corresponding half.
+    /// (No remove operation; shift only). Returns performed moves.
     /// </summary>
     List<GridShiftMove> FillEdgeGaps();
 }

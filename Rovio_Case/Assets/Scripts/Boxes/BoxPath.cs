@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Basit bir path tanımı: local space'te waypoint listesi.
-/// Box world pozisyonuna bu local noktalar eklenerek path izler.
+/// Simple path definition using local-space waypoints.
+/// Box follows the path by adding these local points to path world origin.
 /// </summary>
 public class BoxPath : MonoBehaviour
 {

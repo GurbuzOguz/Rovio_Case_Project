@@ -22,13 +22,13 @@ public class ProductInteractionService : IProductInteractionService
 
         _isBusy = true;
 
-        // 1) View pull (varsa)
+        // 1) Pull view if available
         _productViewService?.TryConsumeAndPullToBox(cell, boxTransform);
 
-        // 2) Data shift
+        // 2) Shift data
         var moves = _gridService.RemoveAndShift(cell, shiftDirection);
 
-        // 3) View shift animasyonu bitince unlock
+        // 3) Unlock after view shift animation completes
         if (_productViewService != null)
         {
             _productViewService.ApplyShiftMoves(moves, () => _isBusy = false);

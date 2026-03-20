@@ -34,7 +34,6 @@ public class GridFrameView : MonoBehaviour
     {
         if (_gridService == null)
         {
-            Debug.LogError("GridFrameView: IGridService is not injected.");
             return;
         }
 
@@ -66,10 +65,10 @@ public class GridFrameView : MonoBehaviour
             return;
         }
 
-        // Grid boyutlarını hesapla
+        // Compute grid dimensions
         Vector3 originWorld = _gridService.GridToWorld(0, 0);
 
-        // En az 1x1 grid varsayıyoruz, cell size'ı komşu hücreden bul
+        // Assume at least a 1x1 grid; infer cell size from neighbor cells
         float cellSizeX = 1f;
         float cellSizeZ = 1f;
 
@@ -79,7 +78,7 @@ public class GridFrameView : MonoBehaviour
         }
         else if (_gridService.Columns == 1 && _gridService.Rows > 1)
         {
-            // Tek sütunlu durumda da satır aralığından yaklaşık al
+            // For single-column grids, approximate from row spacing
             cellSizeX = Mathf.Abs(_gridService.GridToWorld(0, 1).z - originWorld.z);
         }
 
@@ -95,7 +94,7 @@ public class GridFrameView : MonoBehaviour
         float width = _gridService.Columns * cellSizeX;
         float height = _gridService.Rows * cellSizeZ;
 
-        // Grid merkezini hesapla
+        // Compute grid center
         Vector3 center = originWorld + new Vector3(
             (width - cellSizeX) * 0.5f,
             0f,
@@ -122,28 +121,28 @@ public class GridFrameView : MonoBehaviour
             return;
         }
 
-        // Alt border
+        // Bottom border
         var bottomPos = center + new Vector3(0f, 0f, -height * 0.5f - borderThickness * 0.5f);
         var bottom = Instantiate(borderPrefab, bottomPos, Quaternion.identity, bordersParent);
         bottom.name = "Border_Bottom";
 
         var bottomTargetScale = new Vector3(width + borderThickness * 2f, borderScaleY, borderThickness);
 
-        // Üst border
+        // Top border
         var topPos = center + new Vector3(0f, 0f, height * 0.5f + borderThickness * 0.5f);
         var top = Instantiate(borderPrefab, topPos, Quaternion.identity, bordersParent);
         top.name = "Border_Top";
 
         var topTargetScale = new Vector3(width + borderThickness * 2f, borderScaleY, borderThickness);
 
-        // Sol border
+        // Left border
         var leftPos = center + new Vector3(-width * 0.5f - borderThickness * 0.5f, 0f, 0f);
         var left = Instantiate(borderPrefab, leftPos, Quaternion.identity, bordersParent);
         left.name = "Border_Left";
 
         var leftTargetScale = new Vector3(borderThickness, borderScaleY, height);
 
-        // Sağ border
+        // Right border
         var rightPos = center + new Vector3(width * 0.5f + borderThickness * 0.5f, 0f, 0f);
         var right = Instantiate(borderPrefab, rightPos, Quaternion.identity, bordersParent);
         right.name = "Border_Right";

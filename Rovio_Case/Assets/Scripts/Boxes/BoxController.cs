@@ -15,6 +15,7 @@ public enum BoxState
 [RequireComponent(typeof(BoxMovementModule))]
 [RequireComponent(typeof(BoxCollectModule))]
 [RequireComponent(typeof(BoxBenchModule))]
+[RequireComponent(typeof(BoxCounterUiFollower))]
 public class BoxController : MonoBehaviour, IBox
 {
     [SerializeField] private BoxConfig boxConfig;
@@ -45,6 +46,7 @@ public class BoxController : MonoBehaviour, IBox
     private BoxMovementModule _movementModuleComponent;
     private BoxCollectModule _collectModuleComponent;
     private BoxBenchModule _benchModuleComponent;
+    private BoxCounterUiFollower _counterUiFollowerComponent;
 
     private int _currentLoad;
     private BoxState _state = BoxState.Idle;
@@ -96,7 +98,6 @@ public class BoxController : MonoBehaviour, IBox
 
         if (boxConfig == null)
         {
-            Debug.LogWarning($"BoxController on {name}: BoxConfig not assigned.");
         }
     }
 
@@ -132,7 +133,6 @@ public class BoxController : MonoBehaviour, IBox
     {
         if (path == null || path.LocalWaypoints == null || path.LocalWaypoints.Count == 0)
         {
-            Debug.LogWarning($"BoxController on {name}: Shared BoxPath is missing or empty.");
             return;
         }
 
@@ -223,7 +223,6 @@ public class BoxController : MonoBehaviour, IBox
 
         if (_benchService == null)
         {
-            Debug.LogWarning($"Box {name}: IBenchService not injected. Staying at end of path.");
             _state = BoxState.OnBench;
             return;
         }
@@ -325,6 +324,7 @@ public class BoxController : MonoBehaviour, IBox
         _movementModuleComponent = GetOrAddComponent(ref _movementModuleComponent);
         _collectModuleComponent = GetOrAddComponent(ref _collectModuleComponent);
         _benchModuleComponent = GetOrAddComponent(ref _benchModuleComponent);
+        _counterUiFollowerComponent = GetOrAddComponent(ref _counterUiFollowerComponent);
 
         _feedbackModule = _feedbackModuleComponent;
         _movementModule = _movementModuleComponent;

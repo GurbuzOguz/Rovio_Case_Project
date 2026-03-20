@@ -4,19 +4,19 @@ using UnityEngine;
 
 public interface IProductViewService
 {
-    /// <summary>Grid hücresindeki product view'i kaydeder.</summary>
+    /// <summary>Registers the product view at the given grid cell.</summary>
     void Register(Vector2Int cell, ProductView view);
 
-    /// <summary>Grid hücresindeki kaydı siler.</summary>
+    /// <summary>Removes the registration for the given grid cell.</summary>
     void Unregister(Vector2Int cell);
 
     /// <summary>
-    /// Hücredeki product view'i tüketir (kayıttan çıkarır) ve varsa box'a çekme animasyonu başlatır.
-    /// View yoksa false döner.
+    /// Consumes the product view at the cell (unregisters it) and starts pull animation to the box.
+    /// Returns false when no view exists.
     /// </summary>
     bool TryConsumeAndPullToBox(Vector2Int cell, Transform boxTransform);
 
-    /// <summary>Grid shift sonrası view'ları yeni hücrelerine kaydırır.</summary>
+    /// <summary>Moves views to their new cells after grid shift.</summary>
     void ApplyShiftMoves(List<GridShiftMove> moves, Action onComplete = null);
 }
 

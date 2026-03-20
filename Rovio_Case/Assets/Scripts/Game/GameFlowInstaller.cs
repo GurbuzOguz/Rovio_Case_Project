@@ -14,7 +14,6 @@ public class GameFlowInstaller : MonoInstaller
         }
         else
         {
-            Debug.LogError("GameFlowInstaller: LevelSequenceConfig not assigned.");
             Container.Bind<LevelSequenceConfig>().FromInstance(ScriptableObject.CreateInstance<LevelSequenceConfig>()).AsSingle();
         }
 

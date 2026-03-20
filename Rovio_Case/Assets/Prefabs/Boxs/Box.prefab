@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 3030347844759252065}
   - component: {fileID: 1859970017759196843}
   - component: {fileID: 799712199522241714}
+  - component: {fileID: 1297317358334978327}
   m_Layer: 6
   m_Name: Box
   m_TagString: Untagged
@@ -193,3 +194,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27e496475ddf8bb428f067a7b92fc489, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoxBenchModule
+--- !u!114 &1297317358334978327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6738593005558391003}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff2aaff83ee43ff4a80d48ede3c2e1d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoxCounterUiFollower
+  worldOffset: {x: 0, y: 1.8, z: 0}
+  fontAsset: {fileID: 11400000, guid: c9f0ab9a170fa4c3596972aa1db04a9a, type: 2}
+  fontSize: 20
+  textColor: {r: 1, g: 1, b: 1, a: 1}
+  useOutline: 1
+  outlineColor: {r: 0, g: 0, b: 0, a: 1}
+  outlineWidth: 0.2
+  sortingOrder: 500
+  bounceDuration: 0.16
+  bounceStrength: 2

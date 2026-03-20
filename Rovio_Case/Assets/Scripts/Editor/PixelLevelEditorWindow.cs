@@ -93,8 +93,8 @@ public class PixelLevelEditorWindow : EditorWindow
     private void DrawHints()
     {
         EditorGUILayout.HelpBox(
-            "Texture import ayarlarinda Read/Write Enabled acik olmali. " +
-            "Pixel-art icin Filter Mode: Point ve compression dusuk/kapali onerilir.",
+            "Texture import settings must have Read/Write Enabled turned on. " +
+            "For pixel art, Filter Mode: Point and low/no compression are recommended.",
             MessageType.Info);
     }
 
@@ -111,7 +111,7 @@ public class PixelLevelEditorWindow : EditorWindow
         ProductPalette workingPalette = ResolveWorkingPalette(pixels, texW, texH);
         if (workingPalette == null || workingPalette.entries == null || workingPalette.entries.Count == 0)
         {
-            EditorUtility.DisplayDialog("Pixel Level Editor", "Palette olusturulamadi veya bos.", "OK");
+            EditorUtility.DisplayDialog("Pixel Level Editor", "Palette could not be created or is empty.", "OK");
             return;
         }
 
@@ -128,7 +128,7 @@ public class PixelLevelEditorWindow : EditorWindow
 
         EditorUtility.DisplayDialog(
             "Pixel Level Editor",
-            $"Level guncellendi.\nCells: {cells.Count}\nPalette Colors: {workingPalette.entries.Count}",
+            $"Level updated.\nCells: {cells.Count}\nPalette Colors: {workingPalette.entries.Count}",
             "OK");
     }
 
@@ -139,7 +139,7 @@ public class PixelLevelEditorWindow : EditorWindow
             var selectedPalette = _paletteOverride != null ? _paletteOverride : _targetLevel.productPalette;
             if (selectedPalette == null)
             {
-                EditorUtility.DisplayDialog("Pixel Level Editor", "UseLevelPalette secili ama palette yok.", "OK");
+                EditorUtility.DisplayDialog("Pixel Level Editor", "UseLevelPalette is selected but no palette is assigned.", "OK");
             }
             return selectedPalette;
         }
@@ -147,7 +147,7 @@ public class PixelLevelEditorWindow : EditorWindow
         var colors = ExtractDistinctColors(pixels, texW, texH);
         if (colors.Count == 0)
         {
-            EditorUtility.DisplayDialog("Pixel Level Editor", "Texture'dan renk cikarilamadi.", "OK");
+            EditorUtility.DisplayDialog("Pixel Level Editor", "No colors could be extracted from the texture.", "OK");
             return null;
         }
 
@@ -157,7 +157,7 @@ public class PixelLevelEditorWindow : EditorWindow
 
         if (!AssetDatabase.IsValidFolder(folder))
         {
-            EditorUtility.DisplayDialog("Pixel Level Editor", $"Gecersiz klasor: {folder}", "OK");
+            EditorUtility.DisplayDialog("Pixel Level Editor", $"Invalid folder: {folder}", "OK");
             return null;
         }
 
@@ -319,7 +319,7 @@ public class PixelLevelEditorWindow : EditorWindow
                 {
                     EditorUtility.DisplayDialog(
                         "Pixel Level Editor",
-                        "Texture readable degil. Import ayarinda Read/Write Enabled acin.",
+                        "Texture is not readable. Enable Read/Write in import settings.",
                         "OK");
                     Selection.activeObject = texture;
                     EditorGUIUtility.PingObject(texture);
@@ -327,7 +327,7 @@ public class PixelLevelEditorWindow : EditorWindow
                 }
             }
 
-            EditorUtility.DisplayDialog("Pixel Level Editor", "Texture okunamadi.", "OK");
+            EditorUtility.DisplayDialog("Pixel Level Editor", "Texture could not be read.", "OK");
             return false;
         }
     }

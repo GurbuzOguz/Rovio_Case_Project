@@ -8,7 +8,7 @@ public class LevelLayout : ScriptableObject
     public GridConfig gridConfig;
 
     [Header("Background")]
-    [Tooltip("Level için arka plan rengi. Product palette ile karışmaz.")]
+    [Tooltip("Background color for this level. Independent from product palette.")]
     public Color backgroundColor = new Color(0.12f, 0.12f, 0.12f, 1f);
 
     [Header("Products Palette")]
@@ -25,7 +25,7 @@ public class LevelLayout : ScriptableObject
     public int initialBoxCount = 9;
 
     [Header("Boxes")]
-    [Tooltip("Level başında hangi BoxConfig'lerin kullanılacağını belirtir. Sıra, sahnedeki spawn point sırasına göre eşlenir.")]
+    [Tooltip("BoxConfigs used at level start. Mapped by scene spawn point order.")]
     public List<BoxConfig> initialBoxConfigs = new List<BoxConfig>();
 }
 

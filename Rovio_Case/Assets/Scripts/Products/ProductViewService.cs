@@ -82,7 +82,7 @@ public class ProductViewService : MonoBehaviour, IProductViewService
         int pendingTweens = 0;
         bool anyTweenScheduled = false;
 
-        // Önce kaynakları topla, sonra dictionary update et
+        // Collect sources first, then update dictionary mapping
         for (int i = 0; i < moves.Count; i++)
         {
             var m = moves[i];

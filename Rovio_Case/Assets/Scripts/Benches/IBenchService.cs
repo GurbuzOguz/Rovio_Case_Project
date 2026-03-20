@@ -6,12 +6,12 @@ public interface IBenchService
     int OccupiedCount { get; }
 
     /// <summary>
-    /// Boş bir bench slot'u ayırır. Slot yoksa false döner.
+    /// Reserves an available bench slot. Returns false if none is available.
     /// </summary>
     bool TryReserveSlot(out Transform slot);
 
     /// <summary>
-    /// Daha önce ayrılmış slot'u serbest bırakır.
+    /// Releases a previously reserved slot.
     /// </summary>
     void ReleaseSlot(Transform slot);
 }

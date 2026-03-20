@@ -45,7 +45,6 @@ public class GridView : MonoBehaviour
     {
         if (tilePrefab == null)
         {
-            Debug.LogWarning("GridView: Tile prefab is not assigned.");
         }
         else
         {
@@ -54,7 +53,6 @@ public class GridView : MonoBehaviour
 
         if (productPrefab == null)
         {
-            Debug.LogWarning("GridView: Product prefab is not assigned.");
         }
         else
         {
@@ -67,7 +65,6 @@ public class GridView : MonoBehaviour
 
         if (palette == null || palette.entries == null || palette.entries.Count == 0)
         {
-            Debug.LogWarning("GridView: ProductPalette on LevelLayout is null or empty. Products will not be colored.");
         }
         else
         {
@@ -82,13 +79,11 @@ public class GridView : MonoBehaviour
     {
         if (_gridService == null)
         {
-            Debug.LogError("GridView: IGridService is not injected.");
             return;
         }
 
         if (_productViewService == null)
         {
-            Debug.LogWarning("GridView: IProductViewService not injected. Products won't animate when collected.");
         }
 
         EnsureParents();
@@ -193,7 +188,7 @@ public class GridView : MonoBehaviour
                 _productViewService?.Register(new Vector2Int(x, y), pv);
                 if (_productViewService == null)
                 {
-                    // Register edemiyoruz, box pull animasyonu çalışmayacak
+                    // Not registered; box pull animation won't play for this view
                 }
 
                 var renderer = product.GetComponentInChildren<Renderer>();
@@ -206,7 +201,7 @@ public class GridView : MonoBehaviour
                 renderer.GetPropertyBlock(mpb);
 
 #if UNITY_2021_2_OR_NEWER
-                // URP Lit / HDRP Lit genellikle _BaseColor kullanıyor
+                // URP/HDRP Lit shaders usually use _BaseColor
                 if (renderer.sharedMaterial != null && renderer.sharedMaterial.HasProperty("_BaseColor"))
                 {
                     mpb.SetColor("_BaseColor", baseColor);

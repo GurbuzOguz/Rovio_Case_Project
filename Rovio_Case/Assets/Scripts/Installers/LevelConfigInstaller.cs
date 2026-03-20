@@ -24,14 +24,12 @@ public class LevelConfigInstaller : ScriptableObjectInstaller<LevelConfigInstall
 
         if (chosenLayout == null)
         {
-            Debug.LogError("LevelConfigInstaller: No LevelLayout assigned/found.");
             chosenLayout = ScriptableObject.CreateInstance<LevelLayout>();
         }
 
         GridConfig chosenGrid = chosenLayout.gridConfig != null ? chosenLayout.gridConfig : gridConfig;
         if (chosenGrid == null)
         {
-            Debug.LogError("LevelConfigInstaller: No GridConfig assigned/found.");
             chosenGrid = ScriptableObject.CreateInstance<GridConfig>();
         }
 

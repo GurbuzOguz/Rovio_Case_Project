@@ -57,7 +57,7 @@ public class SceneServicesInstaller : MonoInstaller
 
         Container.BindInterfacesTo<FrameRateInitializer>().AsSingle().NonLazy();
 
-        // Level'e göre background rengini palette'den ayarla.
+        // Set background color from current level configuration.
         if (!Container.HasBinding<LevelBackgroundColorInitializer>())
         {
             Container.BindInterfacesTo<LevelBackgroundColorInitializer>().AsSingle().NonLazy();
