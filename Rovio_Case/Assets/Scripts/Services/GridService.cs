@@ -110,7 +110,7 @@ public class GridService : IGridService
         return _products.Count == 0;
     }
 
-    public bool TryFindAlignedProductCell(Vector3 worldPosition, float alignTolerance, int colorId, out Vector2Int cell)
+    public bool TryFindClosestAlignedProductCell(AlignedProductQuery query, out Vector2Int cell)
     {
         cell = default;
 
@@ -119,24 +119,9 @@ public class GridService : IGridService
             return false;
         }
 
-        var origin = _gridConfig.origin;
-        var size = _gridConfig.cellSize;
-
-        // Grid üzerindeki hücre merkezleri:
-        // xCenter = origin.x + x*size
-        // zCenter = origin.z + y*size
-        // Not: Box gridin dışında dolaşabileceği için en yakın satır/sütunu clamp ediyoruz.
-        float localX = worldPosition.x - origin.x;
-        float localZ = worldPosition.z - origin.z;
-
-        int nearestColumn = Mathf.Clamp(Mathf.RoundToInt(localX / size), 0, Columns - 1);
-        int nearestRow = Mathf.Clamp(Mathf.RoundToInt(localZ / size), 0, Rows - 1);
-
-        float colCenterX = origin.x + nearestColumn * size;
-        float rowCenterZ = origin.z + nearestRow * size;
-
-        bool columnAligned = Mathf.Abs(worldPosition.x - colCenterX) <= alignTolerance;
-        bool rowAligned = Mathf.Abs(worldPosition.z - rowCenterZ) <= alignTolerance;
+        var alignment = BuildAlignmentSnapshot(query.WorldPosition, query.AlignTolerance);
+        bool columnAligned = alignment.columnAligned;
+        bool rowAligned = alignment.rowAligned;
 
         if (!columnAligned && !rowAligned)
         {
@@ -150,14 +135,14 @@ public class GridService : IGridService
         // Aynı renk için, hizalı sütun/satır üzerindeki productları tara.
         foreach (var kvp in _products)
         {
-            if (kvp.Value != colorId)
+            if (kvp.Value != query.ColorId)
             {
                 continue;
             }
 
             var c = kvp.Key;
-            bool matchesColumn = columnAligned && c.x == nearestColumn;
-            bool matchesRow = rowAligned && c.y == nearestRow;
+            bool matchesColumn = columnAligned && c.x == alignment.nearestColumn;
+            bool matchesRow = rowAligned && c.y == alignment.nearestRow;
 
             // İki hizalamadan en az birine uymalı
             if (!matchesColumn && !matchesRow)
@@ -166,7 +151,7 @@ public class GridService : IGridService
             }
 
             Vector3 cellWorld = GridToWorld(c.x, c.y);
-            float distSqr = (new Vector2(worldPosition.x, worldPosition.z) - new Vector2(cellWorld.x, cellWorld.z)).sqrMagnitude;
+            float distSqr = (new Vector2(query.WorldPosition.x, query.WorldPosition.z) - new Vector2(cellWorld.x, cellWorld.z)).sqrMagnitude;
 
             if (distSqr < bestDistSqr)
             {
@@ -183,6 +168,26 @@ public class GridService : IGridService
 
         cell = bestCell;
         return true;
+    }
+
+    private (int nearestColumn, int nearestRow, bool columnAligned, bool rowAligned) BuildAlignmentSnapshot(Vector3 worldPosition, float alignTolerance)
+    {
+        var origin = _gridConfig.origin;
+        var size = _gridConfig.cellSize;
+
+        float localX = worldPosition.x - origin.x;
+        float localZ = worldPosition.z - origin.z;
+
+        int nearestColumn = Mathf.Clamp(Mathf.RoundToInt(localX / size), 0, Columns - 1);
+        int nearestRow = Mathf.Clamp(Mathf.RoundToInt(localZ / size), 0, Rows - 1);
+
+        float colCenterX = origin.x + nearestColumn * size;
+        float rowCenterZ = origin.z + nearestRow * size;
+
+        bool columnAligned = Mathf.Abs(worldPosition.x - colCenterX) <= alignTolerance;
+        bool rowAligned = Mathf.Abs(worldPosition.z - rowCenterZ) <= alignTolerance;
+
+        return (nearestColumn, nearestRow, columnAligned, rowAligned);
     }
 
     public IReadOnlyDictionary<int, int> GetRemainingCountsByColorId()

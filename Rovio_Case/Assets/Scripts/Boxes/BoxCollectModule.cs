@@ -62,7 +62,8 @@ public class BoxCollectModule : MonoBehaviour, IBoxCollectModule
             return false;
         }
 
-        if (!gridService.TryFindAlignedProductCell(pos, alignTolerance, boxConfig.colorId, out var cell))
+        var query = new AlignedProductQuery(pos, alignTolerance, boxConfig.colorId);
+        if (!gridService.TryFindClosestAlignedProductCell(query, out var cell))
         {
             return false;
         }

@@ -18,10 +18,9 @@ public interface IGridService
     bool AreAllProductsCollected();
 
     /// <summary>
-    /// World pozisyonu grid satır/sütun merkezlerinden birine hizalıysa,
-    /// o satır/sütunda (aynı X veya aynı Y) verilen colorId'ye sahip bir product hücresi bulur.
+    /// Query'e göre hizalı eksendeki en yakın product hücresini bulur.
     /// </summary>
-    bool TryFindAlignedProductCell(Vector3 worldPosition, float alignTolerance, int colorId, out Vector2Int cell);
+    bool TryFindClosestAlignedProductCell(AlignedProductQuery query, out Vector2Int cell);
 
     /// <summary>Grid'de kalan product sayıları (colorId -> count).</summary>
     IReadOnlyDictionary<int, int> GetRemainingCountsByColorId();
