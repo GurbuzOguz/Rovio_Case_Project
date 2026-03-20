@@ -223,6 +223,20 @@ public class BoxSpawner : MonoBehaviour
 
     private int GetPaletteColorIdForIndex(int index, LevelLayout levelLayout)
     {
+        // Oncelik: Grid'de gercekten bulunan renkler.
+        // Boylece hic urunu olmayan renkte kutu spawn olmayip tiklayinca aninda kapanma olmaz.
+        if (_gridService != null)
+        {
+            var remaining = _gridService.GetRemainingCountsByColorId();
+            if (remaining != null && remaining.Count > 0)
+            {
+                var activeColorIds = new List<int>(remaining.Keys);
+                activeColorIds.Sort();
+                int activeIdx = Mathf.Abs(index) % activeColorIds.Count;
+                return activeColorIds[activeIdx];
+            }
+        }
+
         var palette = levelLayout != null ? levelLayout.productPalette : null;
         if (palette == null || palette.entries == null || palette.entries.Count == 0)
         {

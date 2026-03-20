@@ -1,0 +1,321 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6697e5fc218d6f24e8fc421fc8e85cde, type: 3}
+  m_Name: LevelLayout_Level_5
+  m_EditorClassIdentifier: Assembly-CSharp::LevelLayout
+  gridConfig: {fileID: 11400000, guid: c8d218240196df342b9d0258bb8e417a, type: 2}
+  backgroundColor: {r: 0.5254902, g: 0.52878445, b: 0.77254903, a: 1}
+  productPalette: {fileID: 11400000, guid: 4576704586d4b7e44a0e6d51be0efc8c, type: 2}
+  products:
+  - x: 0
+    y: 0
+    colorId: 0
+  - x: 1
+    y: 0
+    colorId: 0
+  - x: 2
+    y: 0
+    colorId: 0
+  - x: 3
+    y: 0
+    colorId: 0
+  - x: 4
+    y: 0
+    colorId: 0
+  - x: 5
+    y: 0
+    colorId: 0
+  - x: 6
+    y: 0
+    colorId: 0
+  - x: 7
+    y: 0
+    colorId: 0
+  - x: 8
+    y: 0
+    colorId: 0
+  - x: 9
+    y: 0
+    colorId: 0
+  - x: 0
+    y: 1
+    colorId: 0
+  - x: 1
+    y: 1
+    colorId: 0
+  - x: 2
+    y: 1
+    colorId: 17
+  - x: 3
+    y: 1
+    colorId: 0
+  - x: 4
+    y: 1
+    colorId: 17
+  - x: 5
+    y: 1
+    colorId: 0
+  - x: 6
+    y: 1
+    colorId: 0
+  - x: 7
+    y: 1
+    colorId: 17
+  - x: 8
+    y: 1
+    colorId: 0
+  - x: 9
+    y: 1
+    colorId: 0
+  - x: 0
+    y: 2
+    colorId: 0
+  - x: 1
+    y: 2
+    colorId: 0
+  - x: 2
+    y: 2
+    colorId: 17
+  - x: 3
+    y: 2
+    colorId: 17
+  - x: 4
+    y: 2
+    colorId: 17
+  - x: 5
+    y: 2
+    colorId: 17
+  - x: 6
+    y: 2
+    colorId: 17
+  - x: 7
+    y: 2
+    colorId: 17
+  - x: 8
+    y: 2
+    colorId: 0
+  - x: 9
+    y: 2
+    colorId: 0
+  - x: 0
+    y: 3
+    colorId: 0
+  - x: 1
+    y: 3
+    colorId: 0
+  - x: 2
+    y: 3
+    colorId: 17
+  - x: 3
+    y: 3
+    colorId: 17
+  - x: 4
+    y: 3
+    colorId: 17
+  - x: 5
+    y: 3
+    colorId: 17
+  - x: 6
+    y: 3
+    colorId: 17
+  - x: 7
+    y: 3
+    colorId: 17
+  - x: 8
+    y: 3
+    colorId: 0
+  - x: 9
+    y: 3
+    colorId: 0
+  - x: 0
+    y: 4
+    colorId: 0
+  - x: 1
+    y: 4
+    colorId: 17
+  - x: 2
+    y: 4
+    colorId: 17
+  - x: 3
+    y: 4
+    colorId: 17
+  - x: 4
+    y: 4
+    colorId: 17
+  - x: 5
+    y: 4
+    colorId: 17
+  - x: 6
+    y: 4
+    colorId: 0
+  - x: 7
+    y: 4
+    colorId: 0
+  - x: 8
+    y: 4
+    colorId: 17
+  - x: 9
+    y: 4
+    colorId: 0
+  - x: 0
+    y: 5
+    colorId: 0
+  - x: 1
+    y: 5
+    colorId: 17
+  - x: 2
+    y: 5
+    colorId: 18
+  - x: 3
+    y: 5
+    colorId: 17
+  - x: 4
+    y: 5
+    colorId: 18
+  - x: 5
+    y: 5
+    colorId: 17
+  - x: 6
+    y: 5
+    colorId: 0
+  - x: 7
+    y: 5
+    colorId: 0
+  - x: 8
+    y: 5
+    colorId: 17
+  - x: 9
+    y: 5
+    colorId: 0
+  - x: 0
+    y: 6
+    colorId: 0
+  - x: 1
+    y: 6
+    colorId: 17
+  - x: 2
+    y: 6
+    colorId: 17
+  - x: 3
+    y: 6
+    colorId: 17
+  - x: 4
+    y: 6
+    colorId: 17
+  - x: 5
+    y: 6
+    colorId: 17
+  - x: 6
+    y: 6
+    colorId: 0
+  - x: 7
+    y: 6
+    colorId: 17
+  - x: 8
+    y: 6
+    colorId: 0
+  - x: 9
+    y: 6
+    colorId: 0
+  - x: 0
+    y: 7
+    colorId: 0
+  - x: 1
+    y: 7
+    colorId: 17
+  - x: 2
+    y: 7
+    colorId: 0
+  - x: 3
+    y: 7
+    colorId: 0
+  - x: 4
+    y: 7
+    colorId: 0
+  - x: 5
+    y: 7
+    colorId: 17
+  - x: 6
+    y: 7
+    colorId: 0
+  - x: 7
+    y: 7
+    colorId: 17
+  - x: 8
+    y: 7
+    colorId: 0
+  - x: 9
+    y: 7
+    colorId: 0
+  - x: 0
+    y: 8
+    colorId: 0
+  - x: 1
+    y: 8
+    colorId: 0
+  - x: 2
+    y: 8
+    colorId: 0
+  - x: 3
+    y: 8
+    colorId: 0
+  - x: 4
+    y: 8
+    colorId: 0
+  - x: 5
+    y: 8
+    colorId: 0
+  - x: 6
+    y: 8
+    colorId: 0
+  - x: 7
+    y: 8
+    colorId: 0
+  - x: 8
+    y: 8
+    colorId: 17
+  - x: 9
+    y: 8
+    colorId: 0
+  - x: 0
+    y: 9
+    colorId: 0
+  - x: 1
+    y: 9
+    colorId: 0
+  - x: 2
+    y: 9
+    colorId: 0
+  - x: 3
+    y: 9
+    colorId: 0
+  - x: 4
+    y: 9
+    colorId: 0
+  - x: 5
+    y: 9
+    colorId: 0
+  - x: 6
+    y: 9
+    colorId: 0
+  - x: 7
+    y: 9
+    colorId: 0
+  - x: 8
+    y: 9
+    colorId: 0
+  - x: 9
+    y: 9
+    colorId: 0
+  benchCapacity: 5
+  initialBoxCount: 9
+  initialBoxConfigs: []
