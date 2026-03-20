@@ -28,6 +28,13 @@ public class LevelFlowService : ILevelFlowService
         ReloadActiveScene();
     }
 
+    public void LoadFirstLevel()
+    {
+        PlayerPrefs.SetInt(LevelPrefsKeys.CurrentLevelIndex, 0);
+        PlayerPrefs.Save();
+        ReloadActiveScene();
+    }
+
     public void LoadNextLevel()
     {
         if (LevelCount <= 0)

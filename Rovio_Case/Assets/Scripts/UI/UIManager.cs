@@ -20,6 +20,7 @@ public class UIManager : MonoBehaviour
     public GameObject endScreenRoot;
     public TMP_Text endTitleText;
     public Button retryButton;
+    public Button tryAgainButton;
     public Button nextButton;
 
     [Header("Options")]
@@ -76,6 +77,12 @@ public class UIManager : MonoBehaviour
         {
             nextButton.onClick.RemoveListener(OnNextClicked);
             nextButton.onClick.AddListener(OnNextClicked);
+        }
+
+        if (tryAgainButton != null)
+        {
+            tryAgainButton.onClick.RemoveListener(OnTryAgainClicked);
+            tryAgainButton.onClick.AddListener(OnTryAgainClicked);
         }
     }
 
@@ -172,9 +179,26 @@ public class UIManager : MonoBehaviour
         {
             nextButton.gameObject.SetActive(state == GameRunState.LevelComplete && _levelFlow.HasNextLevel);
         }
+
+        if (retryButton != null)
+        {
+            retryButton.gameObject.SetActive(showEndScreen);
+        }
+
+        if (tryAgainButton != null)
+        {
+            tryAgainButton.gameObject.SetActive(state == GameRunState.LevelFail);
+        }
     }
 
     private void OnRetryClicked()
+    {
+        _sfxService?.Play(SfxId.UiClick);
+        _hapticService?.Selection();
+        StartCoroutine(RunAfterUiClickDelay(() => _levelFlow?.LoadFirstLevel()));
+    }
+
+    private void OnTryAgainClicked()
     {
         _sfxService?.Play(SfxId.UiClick);
         _hapticService?.Selection();

@@ -5,6 +5,7 @@ public interface ILevelFlowService
     bool HasNextLevel { get; }
 
     void RestartLevel();
+    void LoadFirstLevel();
     void LoadNextLevel();
 }
 
