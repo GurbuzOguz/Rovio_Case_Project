@@ -13,6 +13,10 @@ GameObject:
   - component: {fileID: 7605554848583452296}
   - component: {fileID: 7103164843214971630}
   - component: {fileID: 7459815070144821622}
+  - component: {fileID: 7452518357668411268}
+  - component: {fileID: 3030347844759252065}
+  - component: {fileID: 1859970017759196843}
+  - component: {fileID: 799712199522241714}
   m_Layer: 6
   m_Name: Box
   m_TagString: Untagged
@@ -129,15 +133,63 @@ MonoBehaviour:
   path: {fileID: 3389060179308432804, guid: 4b124b45e57d2c147b3473bc5237b20b, type: 3}
   defaultMoveSpeed: 7
   defaultBoxColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &7452518357668411268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6738593005558391003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba1942753ae3e944d9247fb3d541eb05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoxFeedbackModule
   playSpawnAnimation: 1
   spawnScaleDuration: 0.25
   visualRoot: {fileID: 0}
-  alignTolerance: 0.2
-  collectInterval: 0.05
-  pullMaxDistance: 3.2
-  onlyPullFromEdgeZones: 1
-  cornerOutsideMargin: 0.15
   playCollectScaleFeedback: 1
-  collectScaleAmount: 0.5
-  collectScaleUpDuration: 0.05
-  collectScaleDownDuration: 0.08
+  collectScaleAmount: 0.73
+  collectScaleUpDuration: 0.08
+  collectScaleDownDuration: 0.12
+--- !u!114 &3030347844759252065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6738593005558391003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20277cd670c4d4740934976311fe1366, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoxMovementModule
+--- !u!114 &1859970017759196843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6738593005558391003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bc28525c4d8c3e48add984f56fb1b31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoxCollectModule
+  alignTolerance: 0.2
+  collectInterval: 0.01
+  pullMaxDistance: 3
+  onlyPullFromEdgeZones: 1
+  cornerOutsideMargin: 0.3
+--- !u!114 &799712199522241714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6738593005558391003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27e496475ddf8bb428f067a7b92fc489, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoxBenchModule
