@@ -116,7 +116,8 @@ public class GridFrameView : MonoBehaviour
             bg.transform.localScale = Vector3.zero;
             bg.transform
                 .DOScale(targetScale, backgroundAnimDuration)
-                .SetEase(Ease.OutQuad);
+                .SetEase(Ease.OutQuad)
+                .SetLink(bg, LinkBehaviour.KillOnDestroy);
 #else
             bg.transform.localScale = targetScale;
 #endif
@@ -174,7 +175,8 @@ public class GridFrameView : MonoBehaviour
         borderTransform.localScale = Vector3.zero;
         borderTransform
             .DOScale(targetScale, borderAnimDuration)
-            .SetEase(Ease.OutBack);
+            .SetEase(Ease.OutBack)
+            .SetLink(borderTransform.gameObject, LinkBehaviour.KillOnDestroy);
     }
 #endif
 }

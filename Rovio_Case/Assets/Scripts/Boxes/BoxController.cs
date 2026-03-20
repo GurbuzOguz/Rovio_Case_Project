@@ -436,6 +436,7 @@ public class BoxController : MonoBehaviour, IBox
         _collectScaleTween = DOTween.Sequence();
         _collectScaleTween
             .SetAutoKill(false)
+            .SetLink(gameObject, LinkBehaviour.KillOnDisable)
             .Pause()
             .Append(visualRoot.DOScale(_initialScale * (1f + amt), upDur).SetEase(Ease.OutQuad))
             .Append(visualRoot.DOScale(_initialScale, downDur).SetEase(Ease.InQuad));

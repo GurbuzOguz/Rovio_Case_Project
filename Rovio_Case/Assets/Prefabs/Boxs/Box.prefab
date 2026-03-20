@@ -134,7 +134,7 @@ MonoBehaviour:
   visualRoot: {fileID: 0}
   alignTolerance: 0.2
   collectInterval: 0.05
-  pullMaxDistance: 3
+  pullMaxDistance: 3.2
   onlyPullFromEdgeZones: 1
   cornerOutsideMargin: 0.15
   playCollectScaleFeedback: 1

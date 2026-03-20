@@ -77,7 +77,8 @@ public class BenchSpawner : MonoBehaviour, IBenchService
                 slot.localScale = Vector3.zero;
                 slot.DOScale(targetScale, spawnScaleDuration)
                     .SetEase(Ease.OutBack)
-                    .SetDelay(i * spawnStagger);
+                    .SetDelay(i * spawnStagger)
+                    .SetLink(slot.gameObject, LinkBehaviour.KillOnDisable);
             }
 #endif
         }
