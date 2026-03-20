@@ -1,4 +1,5 @@
 using UnityEngine;
+using DG.Tweening;
 
 public class ProductView : MonoBehaviour
 {
@@ -9,6 +10,16 @@ public class ProductView : MonoBehaviour
     {
         Cell = cell;
         ColorId = colorId;
+    }
+
+    private void OnDisable()
+    {
+        transform.DOKill(false);
+    }
+
+    private void OnDestroy()
+    {
+        transform.DOKill(false);
     }
 }
 

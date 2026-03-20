@@ -78,11 +78,6 @@ public class BoxSpawner : MonoBehaviour
         int maxBySpawnPoints = spawnPoints.Count;
         int maxBoxes = Mathf.Min(_levelLayout.initialBoxCount, maxBySpawnPoints);
 
-        Debug.Log(
-            $"BoxSpawner: initialBoxCount={_levelLayout.initialBoxCount}, " +
-            $"initialBoxConfigs={maxByConfig}, spawnPoints={maxBySpawnPoints} " +
-            $"=> spawning {maxBoxes} boxes.");
-
         if (maxBoxes <= 0)
         {
             Debug.LogWarning("BoxSpawner: maxBoxes is 0. Check LevelLayout.initialBoxConfigs and BoxSpawner.spawnPoints.");

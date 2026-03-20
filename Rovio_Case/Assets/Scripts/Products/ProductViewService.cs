@@ -51,18 +51,19 @@ public class ProductViewService : MonoBehaviour, IProductViewService
             t.DOKill(false);
 
             Vector3 targetPos = boxTransform.position;
-            Sequence seq = DOTween.Sequence();
-            seq.Join(t.DOMove(targetPos, pullDuration).SetEase(pullMoveEase));
-            seq.Join(t.DOScale(Vector3.one * pullScaleTo, pullDuration).SetEase(pullScaleEase));
-            // View destroy edilirse tween otomatik sonlansın (null target uyarılarını önler)
-            seq.SetLink(view.gameObject, LinkBehaviour.KillOnDestroy);
-            seq.OnComplete(() =>
-            {
-                if (view != null)
+            t.DOMove(targetPos, pullDuration)
+                .SetEase(pullMoveEase)
+                .SetLink(view.gameObject, LinkBehaviour.KillOnDestroy)
+                .OnComplete(() =>
                 {
-                    Destroy(view.gameObject);
-                }
-            });
+                    if (view != null)
+                    {
+                        Destroy(view.gameObject);
+                    }
+                });
+            t.DOScale(Vector3.one * pullScaleTo, pullDuration)
+                .SetEase(pullScaleEase)
+                .SetLink(view.gameObject, LinkBehaviour.KillOnDestroy);
             return true;
         }
 
@@ -78,9 +79,8 @@ public class ProductViewService : MonoBehaviour, IProductViewService
             return;
         }
 
-        Sequence seq = null;
-        seq = DOTween.Sequence();
-        seq.SetLink(gameObject, LinkBehaviour.KillOnDestroy);
+        int pendingTweens = 0;
+        bool anyTweenScheduled = false;
 
         // Önce kaynakları topla, sonra dictionary update et
         for (int i = 0; i < moves.Count; i++)
@@ -98,24 +98,37 @@ public class ProductViewService : MonoBehaviour, IProductViewService
             if (_gridService != null)
             {
                 Vector3 targetWorld = _gridService.GridToWorld(m.to.x, m.to.y);
-                if (seq != null)
+                pendingTweens++;
+                anyTweenScheduled = true;
+
+                bool settled = false;
+                System.Action settle = () =>
                 {
-                    seq.Join(view.transform
-                        .DOMove(new Vector3(targetWorld.x, view.transform.position.y, targetWorld.z), 0.2f)
-                        .SetEase(Ease.OutQuad)
-                        .SetLink(view.gameObject, LinkBehaviour.KillOnDestroy));
-                }
+                    if (settled)
+                    {
+                        return;
+                    }
+                    settled = true;
+                    pendingTweens--;
+                    if (pendingTweens <= 0)
+                    {
+                        onComplete?.Invoke();
+                    }
+                };
+
+                view.transform
+                    .DOMove(new Vector3(targetWorld.x, view.transform.position.y, targetWorld.z), 0.2f)
+                    .SetEase(Ease.OutQuad)
+                    .SetLink(view.gameObject, LinkBehaviour.KillOnDestroy)
+                    .OnComplete(() => settle())
+                    .OnKill(() => settle());
             }
         }
 
-        if (seq != null)
+        if (!anyTweenScheduled)
         {
-            seq.OnComplete(() => onComplete?.Invoke());
-            seq.Play();
-            return;
+            onComplete?.Invoke();
         }
-
-        onComplete?.Invoke();
     }
 }
 
