@@ -4,9 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using Zenject;
-#if DOTWEEN_EXISTS || true
 using DG.Tweening;
-#endif
 
 [DisallowMultipleComponent]
 public class UIManager : MonoBehaviour
@@ -88,12 +86,10 @@ public class UIManager : MonoBehaviour
             _gameState.StateChanged += HandleStateChanged;
         }
 
-#if DOTWEEN_EXISTS || true
         if (playIntroAnimations)
         {
             PlayHudIntro();
         }
-#endif
 
         RefreshLevelText();
         RefreshRemainingText();
@@ -167,12 +163,10 @@ public class UIManager : MonoBehaviour
                 state == GameRunState.LevelFail ? "LEVEL FAIL" : "";
         }
 
-#if DOTWEEN_EXISTS || true
         if (playIntroAnimations && showEndScreen)
         {
             PlayEndScreenIntro();
         }
-#endif
 
         if (nextButton != null && _levelFlow != null)
         {
@@ -233,7 +227,6 @@ public class UIManager : MonoBehaviour
         _introPositionsCached = true;
     }
 
-#if DOTWEEN_EXISTS || true
     private void PlayHudIntro()
     {
         CacheIntroTargets();
@@ -272,8 +265,7 @@ public class UIManager : MonoBehaviour
             .DOAnchorPos(finalPos, introDuration)
             .SetEase(introEase)
             .SetDelay(delay)
-            .SetLink(gameObject, LinkBehaviour.KillOnDisable);
+            .SetLink(gameObject, LinkBehaviour.KillOnDestroy);
     }
-#endif
 }
 

@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
-#if DOTWEEN_EXISTS || true
 using DG.Tweening;
-#endif
 
 [DisallowMultipleComponent]
 public class BoxMovementModule : MonoBehaviour, IBoxMovementModule
@@ -29,9 +27,7 @@ public class BoxMovementModule : MonoBehaviour, IBoxMovementModule
             _moveRoutine = null;
         }
 
-#if DOTWEEN_EXISTS || true
         transform.DOKill(false);
-#endif
     }
 
     private IEnumerator MoveAlongPathRoutine(BoxPath path, float speed, Action onMoveUpdate, Action onPathCompleted)
@@ -44,22 +40,13 @@ public class BoxMovementModule : MonoBehaviour, IBoxMovementModule
             Vector3 targetPos = origin + waypoints[i];
             float segmentDuration = Vector3.Distance(transform.position, targetPos) / speed;
 
-#if DOTWEEN_EXISTS || true
             Tween moveTween = transform
                 .DOMove(targetPos, segmentDuration)
                 .SetEase(Ease.Linear)
                 .OnUpdate(() => onMoveUpdate?.Invoke());
-            moveTween.SetLink(gameObject, LinkBehaviour.KillOnDisable);
+            moveTween.SetLink(gameObject, LinkBehaviour.KillOnDestroy);
 
             yield return moveTween.WaitForCompletion();
-#else
-            while ((transform.position - targetPos).sqrMagnitude > 0.0001f)
-            {
-                transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
-                onMoveUpdate?.Invoke();
-                yield return null;
-            }
-#endif
         }
 
         _moveRoutine = null;

@@ -1,8 +1,6 @@
 using System;
 using UnityEngine;
-#if DOTWEEN_EXISTS || true
 using DG.Tweening;
-#endif
 
 [DisallowMultipleComponent]
 public class BoxBenchModule : MonoBehaviour, IBoxBenchModule
@@ -39,16 +37,11 @@ public class BoxBenchModule : MonoBehaviour, IBoxBenchModule
         }
 
         Vector3 benchPos = _reservedBenchSlot.position;
-#if DOTWEEN_EXISTS || true
         transform
             .DOMove(benchPos, 0.25f)
             .SetEase(Ease.OutQuad)
-            .SetLink(gameObject, LinkBehaviour.KillOnDisable)
+            .SetLink(gameObject, LinkBehaviour.KillOnDestroy)
             .OnComplete(() => onBenchArrived?.Invoke(benchPos));
-#else
-        transform.position = benchPos;
-        onBenchArrived?.Invoke(benchPos);
-#endif
         return true;
     }
 }

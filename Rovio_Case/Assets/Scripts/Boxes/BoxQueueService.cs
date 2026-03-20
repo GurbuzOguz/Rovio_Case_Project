@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-#if DOTWEEN_EXISTS || true
 using DG.Tweening;
-#endif
 
 public class BoxQueueService : IBoxQueueService
 {
@@ -41,14 +39,10 @@ public class BoxQueueService : IBoxQueueService
                 continue;
             }
 
-#if DOTWEEN_EXISTS || true
             box.transform
                 .DOMove(targetSlot.position, queueShiftDuration)
                 .SetEase(Ease.OutQuad)
-                .SetLink(box.gameObject, LinkBehaviour.KillOnDisable);
-#else
-            box.transform.position = targetSlot.position;
-#endif
+                .SetLink(box.gameObject, LinkBehaviour.KillOnDestroy);
 
             activeBoxes[dstIndex] = box;
             activeBoxes[srcIndex] = null;

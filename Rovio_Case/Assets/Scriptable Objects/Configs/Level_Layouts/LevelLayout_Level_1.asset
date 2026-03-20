@@ -31,6 +31,75 @@ MonoBehaviour:
   - x: 5
     y: 0
     colorId: 0
+  - x: 6
+    y: 0
+    colorId: 0
+  - x: 7
+    y: 0
+    colorId: 0
+  - x: 8
+    y: 0
+    colorId: 0
+  - x: 9
+    y: 0
+    colorId: 0
+  - x: 10
+    y: 0
+    colorId: 0
+  - x: 0
+    y: 1
+    colorId: 0
+  - x: 0
+    y: 2
+    colorId: 0
+  - x: 0
+    y: 3
+    colorId: 0
+  - x: 0
+    y: 4
+    colorId: 0
+  - x: 0
+    y: 5
+    colorId: 0
+  - x: 0
+    y: 6
+    colorId: 0
+  - x: 0
+    y: 7
+    colorId: 0
+  - x: 0
+    y: 8
+    colorId: 0
+  - x: 0
+    y: 9
+    colorId: 0
+  - x: 1
+    y: 9
+    colorId: 0
+  - x: 2
+    y: 9
+    colorId: 0
+  - x: 3
+    y: 9
+    colorId: 0
+  - x: 4
+    y: 9
+    colorId: 0
+  - x: 5
+    y: 9
+    colorId: 0
+  - x: 6
+    y: 9
+    colorId: 0
+  - x: 7
+    y: 9
+    colorId: 0
+  - x: 8
+    y: 9
+    colorId: 0
+  - x: 9
+    y: 9
+    colorId: 0
   benchCapacity: 5
   initialBoxCount: 9
   initialBoxConfigs: []

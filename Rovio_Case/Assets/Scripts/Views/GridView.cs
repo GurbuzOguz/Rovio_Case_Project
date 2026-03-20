@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
-#if DOTWEEN_EXISTS || true
 using DG.Tweening;
-#endif
 
 public class GridView : MonoBehaviour
 {
@@ -132,13 +130,11 @@ public class GridView : MonoBehaviour
                 var tile = Instantiate(tilePrefab, worldPos, Quaternion.identity, tilesParent);
                 tile.name = $"Tile_{x}_{y}";
 
-#if DOTWEEN_EXISTS || true
                 tile.transform.localScale = Vector3.zero;
                 tile.transform
                     .DOScale(_tileInitialScale, tileScaleDuration)
                     .SetEase(Ease.OutBounce)
                     .SetLink(tile.gameObject, LinkBehaviour.KillOnDestroy);
-#endif
             }
         }
     }
@@ -224,7 +220,6 @@ public class GridView : MonoBehaviour
 
                 renderer.SetPropertyBlock(mpb);
 
-#if DOTWEEN_EXISTS || true
                 product.transform.localScale = Vector3.zero;
                 float delay = spawnedCount * productSpawnDelay;
                 product.transform
@@ -232,7 +227,6 @@ public class GridView : MonoBehaviour
                     .SetEase(Ease.OutBack)
                     .SetDelay(delay)
                     .SetLink(product.gameObject, LinkBehaviour.KillOnDestroy);
-#endif
 
                 spawnedCount++;
             }

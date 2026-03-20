@@ -1,8 +1,6 @@
 using System;
 using UnityEngine;
-#if DOTWEEN_EXISTS || true
 using DG.Tweening;
-#endif
 
 [DisallowMultipleComponent]
 public class BoxFeedbackModule : MonoBehaviour, IBoxFeedbackModule
@@ -22,9 +20,7 @@ public class BoxFeedbackModule : MonoBehaviour, IBoxFeedbackModule
     private Vector3 _initialScale = Vector3.one;
     private bool _initialized;
 
-#if DOTWEEN_EXISTS || true
     private Sequence _collectScaleTween;
-#endif
 
     public void Initialize()
     {
@@ -41,15 +37,12 @@ public class BoxFeedbackModule : MonoBehaviour, IBoxFeedbackModule
 
         _initialScale = visualRoot != null ? visualRoot.localScale : Vector3.one;
 
-#if DOTWEEN_EXISTS || true
         ConfigureCollectScaleTween();
-#endif
         _initialized = true;
     }
 
     public void OnEnableModule()
     {
-#if DOTWEEN_EXISTS || true
         if (!_initialized)
         {
             Initialize();
@@ -59,12 +52,10 @@ public class BoxFeedbackModule : MonoBehaviour, IBoxFeedbackModule
         {
             PlaySpawnAnimation();
         }
-#endif
     }
 
     public void OnDisableModule()
     {
-#if DOTWEEN_EXISTS || true
         transform.DOKill(false);
         if (visualRoot != null)
         {
@@ -77,17 +68,14 @@ public class BoxFeedbackModule : MonoBehaviour, IBoxFeedbackModule
             _collectScaleTween.Pause();
             _collectScaleTween.Rewind();
         }
-#endif
     }
 
     public void OnDestroyModule()
     {
-#if DOTWEEN_EXISTS || true
         if (_collectScaleTween != null && _collectScaleTween.IsActive())
         {
             _collectScaleTween.Kill(false);
         }
-#endif
     }
 
     public void PlayClickFeedback(ISfxService sfxService, IHapticService hapticService, IParticleService particleService)
@@ -127,7 +115,6 @@ public class BoxFeedbackModule : MonoBehaviour, IBoxFeedbackModule
 
     public void PlayDeactivateScaleAnimation(float duration, Action onComplete)
     {
-#if DOTWEEN_EXISTS || true
         transform.DOKill(false);
         if (visualRoot != null)
         {
@@ -135,15 +122,13 @@ public class BoxFeedbackModule : MonoBehaviour, IBoxFeedbackModule
             visualRoot
                 .DOScale(Vector3.zero, duration)
                 .SetEase(Ease.InQuad)
-                .SetLink(gameObject, LinkBehaviour.KillOnDisable)
+                .SetLink(gameObject, LinkBehaviour.KillOnDestroy)
                 .OnComplete(() => onComplete?.Invoke());
             return;
         }
-#endif
         onComplete?.Invoke();
     }
 
-#if DOTWEEN_EXISTS || true
     private void PlaySpawnAnimation()
     {
         if (visualRoot == null)
@@ -156,7 +141,7 @@ public class BoxFeedbackModule : MonoBehaviour, IBoxFeedbackModule
         visualRoot
             .DOScale(_initialScale, spawnScaleDuration)
             .SetEase(Ease.OutBack)
-            .SetLink(gameObject, LinkBehaviour.KillOnDisable);
+            .SetLink(gameObject, LinkBehaviour.KillOnDestroy);
     }
 
     private void ConfigureCollectScaleTween()
@@ -178,7 +163,7 @@ public class BoxFeedbackModule : MonoBehaviour, IBoxFeedbackModule
         _collectScaleTween = DOTween.Sequence();
         _collectScaleTween
             .SetAutoKill(false)
-            .SetLink(gameObject, LinkBehaviour.KillOnDisable)
+            .SetLink(gameObject, LinkBehaviour.KillOnDestroy)
             .Pause()
             .Append(visualRoot.DOScale(_initialScale * (1f + amt), upDur).SetEase(Ease.OutQuad))
             .Append(visualRoot.DOScale(_initialScale, downDur).SetEase(Ease.InQuad));
@@ -204,9 +189,4 @@ public class BoxFeedbackModule : MonoBehaviour, IBoxFeedbackModule
         _collectScaleTween.Rewind();
         _collectScaleTween.Restart();
     }
-#else
-    private void PlayCollectScaleFeedback()
-    {
-    }
-#endif
 }

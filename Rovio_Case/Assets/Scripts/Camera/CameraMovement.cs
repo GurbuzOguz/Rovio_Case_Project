@@ -67,7 +67,7 @@ public class CameraMovement : MonoBehaviour
             introDuration
         )
         .SetEase(Ease.InOutBack)
-        .SetLink(gameObject, LinkBehaviour.KillOnDisable);
+        .SetLink(gameObject, LinkBehaviour.KillOnDestroy);
     }
 
     private void HandleStateChanged(GameRunState state)
@@ -96,7 +96,7 @@ public class CameraMovement : MonoBehaviour
             winDuration
         )
         .SetEase(Ease.OutCubic)
-        .SetLink(gameObject, LinkBehaviour.KillOnDisable);
+        .SetLink(gameObject, LinkBehaviour.KillOnDestroy);
     }
 
     private void PlayLoseMotion()
@@ -105,6 +105,6 @@ public class CameraMovement : MonoBehaviour
         virtualCamera.transform
             .DOShakePosition(loseShakeDuration, loseShakeStrength, loseShakeVibrato, 90f, false, true)
             .SetEase(Ease.OutQuad)
-            .SetLink(gameObject, LinkBehaviour.KillOnDisable);
+            .SetLink(gameObject, LinkBehaviour.KillOnDestroy);
     }
 }

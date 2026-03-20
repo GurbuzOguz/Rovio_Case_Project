@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
-#if DOTWEEN_EXISTS || true
 using DG.Tweening;
-#endif
 
 public class BenchSpawner : MonoBehaviour, IBenchService
 {
@@ -70,7 +68,6 @@ public class BenchSpawner : MonoBehaviour, IBenchService
                 continue;
             }
 
-#if DOTWEEN_EXISTS || true
             if (animate)
             {
                 Vector3 targetScale = i < _initialScales.Count ? _initialScales[i] : slot.localScale;
@@ -78,9 +75,8 @@ public class BenchSpawner : MonoBehaviour, IBenchService
                 slot.DOScale(targetScale, spawnScaleDuration)
                     .SetEase(Ease.OutBack)
                     .SetDelay(i * spawnStagger)
-                    .SetLink(slot.gameObject, LinkBehaviour.KillOnDisable);
+                    .SetLink(slot.gameObject, LinkBehaviour.KillOnDestroy);
             }
-#endif
         }
     }
 

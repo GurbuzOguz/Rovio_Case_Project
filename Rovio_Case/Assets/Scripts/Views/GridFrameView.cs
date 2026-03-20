@@ -1,8 +1,6 @@
 using UnityEngine;
 using Zenject;
-#if DOTWEEN_EXISTS || true
 using DG.Tweening;
-#endif
 
 public class GridFrameView : MonoBehaviour
 {
@@ -112,15 +110,11 @@ public class GridFrameView : MonoBehaviour
 
             var targetScale = new Vector3(width, backgroundScaleY, height);
 
-#if DOTWEEN_EXISTS || true
             bg.transform.localScale = Vector3.zero;
             bg.transform
                 .DOScale(targetScale, backgroundAnimDuration)
                 .SetEase(Ease.OutQuad)
                 .SetLink(bg, LinkBehaviour.KillOnDestroy);
-#else
-            bg.transform.localScale = targetScale;
-#endif
         }
 
         if (borderPrefab == null)
@@ -156,20 +150,12 @@ public class GridFrameView : MonoBehaviour
 
         var rightTargetScale = new Vector3(borderThickness, borderScaleY, height);
 
-#if DOTWEEN_EXISTS || true
         AnimateBorder(bottom.transform, bottomTargetScale);
         AnimateBorder(top.transform, topTargetScale);
         AnimateBorder(left.transform, leftTargetScale);
         AnimateBorder(right.transform, rightTargetScale);
-#else
-        bottom.transform.localScale = bottomTargetScale;
-        top.transform.localScale = topTargetScale;
-        left.transform.localScale = leftTargetScale;
-        right.transform.localScale = rightTargetScale;
-#endif
     }
 
-#if DOTWEEN_EXISTS || true
     private void AnimateBorder(Transform borderTransform, Vector3 targetScale)
     {
         borderTransform.localScale = Vector3.zero;
@@ -178,6 +164,5 @@ public class GridFrameView : MonoBehaviour
             .SetEase(Ease.OutBack)
             .SetLink(borderTransform.gameObject, LinkBehaviour.KillOnDestroy);
     }
-#endif
 }
 

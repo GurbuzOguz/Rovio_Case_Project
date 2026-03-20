@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
-#if DOTWEEN_EXISTS || true
 using DG.Tweening;
-#endif
 
 public class ProductViewService : MonoBehaviour, IProductViewService
 {
@@ -47,7 +45,6 @@ public class ProductViewService : MonoBehaviour, IProductViewService
 
         _views.Remove(cell);
 
-#if DOTWEEN_EXISTS || true
         if (boxTransform != null)
         {
             var t = view.transform;
@@ -68,7 +65,6 @@ public class ProductViewService : MonoBehaviour, IProductViewService
             });
             return true;
         }
-#endif
 
         Destroy(view.gameObject);
         return true;
@@ -83,10 +79,8 @@ public class ProductViewService : MonoBehaviour, IProductViewService
         }
 
         Sequence seq = null;
-#if DOTWEEN_EXISTS || true
         seq = DOTween.Sequence();
         seq.SetLink(gameObject, LinkBehaviour.KillOnDestroy);
-#endif
 
         // Önce kaynakları topla, sonra dictionary update et
         for (int i = 0; i < moves.Count; i++)
@@ -104,7 +98,6 @@ public class ProductViewService : MonoBehaviour, IProductViewService
             if (_gridService != null)
             {
                 Vector3 targetWorld = _gridService.GridToWorld(m.to.x, m.to.y);
-#if DOTWEEN_EXISTS || true
                 if (seq != null)
                 {
                     seq.Join(view.transform
@@ -112,20 +105,15 @@ public class ProductViewService : MonoBehaviour, IProductViewService
                         .SetEase(Ease.OutQuad)
                         .SetLink(view.gameObject, LinkBehaviour.KillOnDestroy));
                 }
-#else
-                view.transform.position = new Vector3(targetWorld.x, view.transform.position.y, targetWorld.z);
-#endif
             }
         }
 
-#if DOTWEEN_EXISTS || true
         if (seq != null)
         {
             seq.OnComplete(() => onComplete?.Invoke());
             seq.Play();
             return;
         }
-#endif
 
         onComplete?.Invoke();
     }
