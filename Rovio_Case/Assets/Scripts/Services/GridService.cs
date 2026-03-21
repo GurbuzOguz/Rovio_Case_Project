@@ -5,6 +5,7 @@ public class GridService : IGridService
 {
     private readonly GridConfig _gridConfig;
     private readonly LevelLayout _levelLayout;
+    private readonly float _runtimeCellSize;
 
     // Cell -> colorId
     private readonly Dictionary<Vector2Int, int> _products =
@@ -17,6 +18,7 @@ public class GridService : IGridService
     {
         _gridConfig = gridConfig;
         _levelLayout = levelLayout;
+        _runtimeCellSize = _gridConfig != null ? _gridConfig.GetRuntimeCellSize() : 1f;
 
         InitializeProducts();
     }
@@ -49,7 +51,7 @@ public class GridService : IGridService
     public Vector3 GridToWorld(int x, int y)
     {
         var origin = _gridConfig.origin;
-        var size = _gridConfig.cellSize;
+        var size = _runtimeCellSize;
 
         return origin + new Vector3(x * size, 0f, y * size);
     }
@@ -57,7 +59,7 @@ public class GridService : IGridService
     public Vector2Int WorldToGrid(Vector3 worldPosition)
     {
         var origin = _gridConfig.origin;
-        var size = _gridConfig.cellSize;
+        var size = _runtimeCellSize;
 
         var local = worldPosition - origin;
         int x = Mathf.RoundToInt(local.x / size);
@@ -173,7 +175,7 @@ public class GridService : IGridService
     private (int nearestColumn, int nearestRow, bool columnAligned, bool rowAligned) BuildAlignmentSnapshot(Vector3 worldPosition, float alignTolerance)
     {
         var origin = _gridConfig.origin;
-        var size = _gridConfig.cellSize;
+        var size = _runtimeCellSize;
 
         float localX = worldPosition.x - origin.x;
         float localZ = worldPosition.z - origin.z;

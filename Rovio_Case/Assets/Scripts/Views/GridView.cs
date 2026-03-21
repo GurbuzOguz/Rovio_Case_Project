@@ -29,6 +29,7 @@ public class GridView : MonoBehaviour
 
     private Vector3 _tileInitialScale = Vector3.one;
     private Vector3 _productInitialScale = Vector3.one;
+    private float _cellScaleFactor = 1f;
 
     [Inject]
     public void Construct(
@@ -60,6 +61,13 @@ public class GridView : MonoBehaviour
         }
 
         _productColors.Clear();
+
+        if (_levelLayout != null && _levelLayout.gridConfig != null)
+        {
+            float baseSize = Mathf.Max(0.0001f, _levelLayout.gridConfig.cellSize);
+            float runtimeSize = _levelLayout.gridConfig.GetRuntimeCellSize();
+            _cellScaleFactor = runtimeSize / baseSize;
+        }
 
         ProductPalette palette = _levelLayout != null ? _levelLayout.productPalette : null;
 
@@ -127,7 +135,7 @@ public class GridView : MonoBehaviour
 
                 tile.transform.localScale = Vector3.zero;
                 tile.transform
-                    .DOScale(_tileInitialScale, tileScaleDuration)
+                    .DOScale(_tileInitialScale * _cellScaleFactor, tileScaleDuration)
                     .SetEase(Ease.OutBounce)
                     .SetLink(tile.gameObject, LinkBehaviour.KillOnDestroy);
             }
@@ -218,7 +226,7 @@ public class GridView : MonoBehaviour
                 product.transform.localScale = Vector3.zero;
                 float delay = spawnedCount * productSpawnDelay;
                 product.transform
-                    .DOScale(_productInitialScale, productScaleDuration)
+                    .DOScale(_productInitialScale * _cellScaleFactor, productScaleDuration)
                     .SetEase(Ease.OutBack)
                     .SetDelay(delay)
                     .SetLink(product.gameObject, LinkBehaviour.KillOnDestroy);

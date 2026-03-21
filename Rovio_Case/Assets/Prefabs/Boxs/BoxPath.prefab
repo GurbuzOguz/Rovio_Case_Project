@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoxPath
   localWaypoints:
-  - {x: 9.03, y: 0, z: -2.26}
+  - {x: 9.5, y: 0, z: -2.26}
   - {x: -2.11, y: 0, z: -2.26}
   - {x: -2.11, y: 0, z: 11}
   - {x: 11.25, y: 0, z: 11}

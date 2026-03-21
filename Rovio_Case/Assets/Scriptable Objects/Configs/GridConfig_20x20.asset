@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b7b37d9951c0a1e44802b10b5a92ca66, type: 3}
-  m_Name: GridConfig_Default
+  m_Name: GridConfig_20x20
   m_EditorClassIdentifier: Assembly-CSharp::GridConfig
-  rows: 10
-  columns: 10
+  rows: 20
+  columns: 20
   cellSize: 1
   origin: {x: 0, y: 0, z: 0}
   keepWorldSizeFromReference: 1

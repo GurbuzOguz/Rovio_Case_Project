@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82e4b926d63e2674dad716f45a7a77d5, type: 3}
+  m_Name: ProductPalette_FromTexture_Bird
+  m_EditorClassIdentifier: Assembly-CSharp::ProductPalette
+  entries:
+  - colorId: 0
+    displayColor: {r: 0.99842787, g: 0.99818957, b: 0.9977961, a: 1}
+  - colorId: 1
+    displayColor: {r: 0.99941224, g: 0.43763545, b: 0.11053702, a: 1}
+  - colorId: 2
+    displayColor: {r: 0.001732533, g: 0.00068085955, b: 0.0003214741, a: 1}
+  - colorId: 3
+    displayColor: {r: 0.1369196, g: 0.5908455, b: 0.95111036, a: 1}
+  - colorId: 4
+    displayColor: {r: 0.30140284, g: 0.68456423, b: 0.31654966, a: 1}

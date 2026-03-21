@@ -91,10 +91,11 @@ public class BoxCollectModule : MonoBehaviour, IBoxCollectModule
         }
 
         var gc = levelLayout.gridConfig;
+        float cellSize = gc.GetRuntimeCellSize();
         float minX = gc.origin.x;
-        float maxX = gc.origin.x + (gc.columns - 1) * gc.cellSize;
+        float maxX = gc.origin.x + (gc.columns - 1) * cellSize;
         float minZ = gc.origin.z;
-        float maxZ = gc.origin.z + (gc.rows - 1) * gc.cellSize;
+        float maxZ = gc.origin.z + (gc.rows - 1) * cellSize;
 
         bool xOutside = worldPos.x < (minX - cornerOutsideMargin) || worldPos.x > (maxX + cornerOutsideMargin);
         bool zOutside = worldPos.z < (minZ - cornerOutsideMargin) || worldPos.z > (maxZ + cornerOutsideMargin);
@@ -109,10 +110,11 @@ public class BoxCollectModule : MonoBehaviour, IBoxCollectModule
             return GridShiftDirection.Left;
         }
 
+        float cellSize = gc.GetRuntimeCellSize();
         float minX = gc.origin.x;
-        float maxX = gc.origin.x + (gc.columns - 1) * gc.cellSize;
+        float maxX = gc.origin.x + (gc.columns - 1) * cellSize;
         float minZ = gc.origin.z;
-        float maxZ = gc.origin.z + (gc.rows - 1) * gc.cellSize;
+        float maxZ = gc.origin.z + (gc.rows - 1) * cellSize;
 
         float leftDist = (minX - worldPos.x);
         float rightDist = (worldPos.x - maxX);

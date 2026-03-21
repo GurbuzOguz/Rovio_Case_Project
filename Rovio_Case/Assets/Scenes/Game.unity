@@ -841,7 +841,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8487d021f10af94cb080aee2ad1700e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DotweenBootstrap
-  tweenersCapacity: 500
+  tweenersCapacity: 1500
   sequencesCapacity: 100
 --- !u!1 &333506350
 GameObject:
