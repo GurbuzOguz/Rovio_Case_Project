@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82e4b926d63e2674dad716f45a7a77d5, type: 3}
+  m_Name: ProductPalette_FromTexture_Cat
+  m_EditorClassIdentifier: Assembly-CSharp::ProductPalette
+  entries:
+  - colorId: 0
+    displayColor: {r: 0.5137512, g: 0.81171495, b: 0.46416357, a: 1}
+  - colorId: 1
+    displayColor: {r: 0.23897634, g: 0.23919867, b: 0.23922162, a: 1}

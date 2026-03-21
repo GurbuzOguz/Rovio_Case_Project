@@ -21,7 +21,7 @@ public class PixelLevelEditorWindow : EditorWindow
     private bool _transparentPixelsToBlack = true;
     private float _alphaThreshold = 0.1f;
     private int _maxPaletteColors = 16;
-    private float _colorEpsilon = 0.0005f;
+    private float _perceptualSimilarity = 2f;
 
     [MenuItem("Tools/Level/Pixel Level Editor")]
     public static void Open()
@@ -57,7 +57,7 @@ public class PixelLevelEditorWindow : EditorWindow
                 _newPaletteFolder = EditorGUILayout.TextField("Palette Folder", _newPaletteFolder);
                 _replaceLevelPalette = EditorGUILayout.Toggle("Assign New Palette To Level", _replaceLevelPalette);
                 _maxPaletteColors = EditorGUILayout.IntSlider("Max Colors", _maxPaletteColors, 2, 64);
-                _colorEpsilon = EditorGUILayout.Slider("Color Merge Epsilon", _colorEpsilon, 0f, 0.02f);
+                _perceptualSimilarity = EditorGUILayout.Slider("Color Similarity (Perceptual)", _perceptualSimilarity, 0.05f, 3f);
             }
         }
 
@@ -251,7 +251,7 @@ public class PixelLevelEditorWindow : EditorWindow
 
     private List<Color> ExtractDistinctColors(Color[] pixels, int texW, int texH)
     {
-        var colors = new List<Color>();
+        var clusters = new List<ColorCluster>();
         for (int y = 0; y < texH; y++)
         {
             for (int x = 0; x < texW; x++)
@@ -262,34 +262,118 @@ public class PixelLevelEditorWindow : EditorWindow
                     c = Color.black;
                 }
 
-                bool exists = false;
-                for (int i = 0; i < colors.Count; i++)
+                Color rgb = new Color(c.r, c.g, c.b, 1f);
+                int bestIdx = -1;
+                float bestDist = float.PositiveInfinity;
+
+                for (int i = 0; i < clusters.Count; i++)
                 {
-                    if (AreColorsNear(colors[i], c, _colorEpsilon))
+                    float d = GetPerceptualDistance(clusters[i].MeanColor, rgb);
+                    if (d < _perceptualSimilarity && d < bestDist)
                     {
-                        exists = true;
-                        break;
+                        bestDist = d;
+                        bestIdx = i;
                     }
                 }
 
-                if (!exists)
+                if (bestIdx >= 0)
                 {
-                    colors.Add(new Color(c.r, c.g, c.b, 1f));
-                    if (colors.Count >= _maxPaletteColors)
-                    {
-                        return colors;
-                    }
+                    clusters[bestIdx] = clusters[bestIdx].Add(rgb);
+                }
+                else if (clusters.Count < _maxPaletteColors)
+                {
+                    clusters.Add(ColorCluster.From(rgb));
                 }
             }
         }
+
+        // If capped by max colors, merge closest clusters until within the limit.
+        while (clusters.Count > _maxPaletteColors)
+        {
+            int a = -1;
+            int b = -1;
+            float best = float.PositiveInfinity;
+            for (int i = 0; i < clusters.Count; i++)
+            {
+                for (int j = i + 1; j < clusters.Count; j++)
+                {
+                    float d = GetPerceptualDistance(clusters[i].MeanColor, clusters[j].MeanColor);
+                    if (d < best)
+                    {
+                        best = d;
+                        a = i;
+                        b = j;
+                    }
+                }
+            }
+
+            if (a < 0 || b < 0)
+            {
+                break;
+            }
+
+            clusters[a] = clusters[a].Merge(clusters[b]);
+            clusters.RemoveAt(b);
+        }
+
+        var colors = new List<Color>(clusters.Count);
+        for (int i = 0; i < clusters.Count; i++)
+        {
+            colors.Add(clusters[i].MeanColor);
+        }
+
         return colors;
     }
 
-    private static bool AreColorsNear(Color a, Color b, float eps)
+    private static float GetPerceptualDistance(Color a, Color b)
     {
-        return Mathf.Abs(a.r - b.r) <= eps
-            && Mathf.Abs(a.g - b.g) <= eps
-            && Mathf.Abs(a.b - b.b) <= eps;
+        Color.RGBToHSV(a, out float ah, out float @as, out float av);
+        Color.RGBToHSV(b, out float bh, out float bs, out float bv);
+
+        float dh = Mathf.Abs(ah - bh);
+        dh = Mathf.Min(dh, 1f - dh); // circular hue distance
+        float ds = Mathf.Abs(@as - bs);
+        float dv = Mathf.Abs(av - bv);
+
+        // Weighted to favor hue differences visible to the eye.
+        return (dh * 2.4f) + (ds * 1.0f) + (dv * 0.8f);
+    }
+
+    private struct ColorCluster
+    {
+        public Color Sum;
+        public int Count;
+
+        public Color MeanColor => Count > 0
+            ? new Color(Sum.r / Count, Sum.g / Count, Sum.b / Count, 1f)
+            : Color.black;
+
+        public static ColorCluster From(Color c)
+        {
+            return new ColorCluster
+            {
+                Sum = new Color(c.r, c.g, c.b, 1f),
+                Count = 1
+            };
+        }
+
+        public ColorCluster Add(Color c)
+        {
+            return new ColorCluster
+            {
+                Sum = new Color(Sum.r + c.r, Sum.g + c.g, Sum.b + c.b, 1f),
+                Count = Count + 1
+            };
+        }
+
+        public ColorCluster Merge(ColorCluster other)
+        {
+            return new ColorCluster
+            {
+                Sum = new Color(Sum.r + other.Sum.r, Sum.g + other.Sum.g, Sum.b + other.Sum.b, 1f),
+                Count = Count + other.Count
+            };
+        }
     }
 
     private bool TryGetReadablePixels(Texture2D texture, out Color[] pixels, out int w, out int h)

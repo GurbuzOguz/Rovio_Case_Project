@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelLayout
   gridConfig: {fileID: 11400000, guid: c8d218240196df342b9d0258bb8e417a, type: 2}
   backgroundColor: {r: 0.5254902, g: 0.52878445, b: 0.77254903, a: 1}
-  productPalette: {fileID: 11400000, guid: 8425ccabaa17f5d4ab2fc7f819ed9635, type: 2}
+  productPalette: {fileID: 11400000, guid: 35c1f0b54f89c464dab11e12bc0d72e4, type: 2}
   products:
   - x: 0
     y: 0
@@ -54,13 +54,13 @@ MonoBehaviour:
     colorId: 0
   - x: 2
     y: 1
-    colorId: 0
+    colorId: 1
   - x: 3
     y: 1
     colorId: 0
   - x: 4
     y: 1
-    colorId: 0
+    colorId: 1
   - x: 5
     y: 1
     colorId: 0
@@ -69,7 +69,7 @@ MonoBehaviour:
     colorId: 0
   - x: 7
     y: 1
-    colorId: 0
+    colorId: 1
   - x: 8
     y: 1
     colorId: 0
@@ -84,22 +84,22 @@ MonoBehaviour:
     colorId: 0
   - x: 2
     y: 2
-    colorId: 0
+    colorId: 1
   - x: 3
     y: 2
-    colorId: 0
+    colorId: 1
   - x: 4
     y: 2
-    colorId: 15
+    colorId: 1
   - x: 5
     y: 2
-    colorId: 0
+    colorId: 1
   - x: 6
     y: 2
-    colorId: 0
+    colorId: 1
   - x: 7
     y: 2
-    colorId: 0
+    colorId: 1
   - x: 8
     y: 2
     colorId: 0
@@ -114,22 +114,22 @@ MonoBehaviour:
     colorId: 0
   - x: 2
     y: 3
-    colorId: 0
+    colorId: 1
   - x: 3
     y: 3
-    colorId: 16
+    colorId: 1
   - x: 4
     y: 3
-    colorId: 16
+    colorId: 1
   - x: 5
     y: 3
-    colorId: 15
+    colorId: 1
   - x: 6
     y: 3
-    colorId: 0
+    colorId: 1
   - x: 7
     y: 3
-    colorId: 0
+    colorId: 1
   - x: 8
     y: 3
     colorId: 0
@@ -141,28 +141,28 @@ MonoBehaviour:
     colorId: 0
   - x: 1
     y: 4
-    colorId: 0
+    colorId: 1
   - x: 2
     y: 4
-    colorId: 17
+    colorId: 1
   - x: 3
     y: 4
-    colorId: 17
+    colorId: 1
   - x: 4
     y: 4
-    colorId: 16
+    colorId: 1
   - x: 5
     y: 4
-    colorId: 16
+    colorId: 1
   - x: 6
     y: 4
-    colorId: 15
+    colorId: 0
   - x: 7
     y: 4
     colorId: 0
   - x: 8
     y: 4
-    colorId: 0
+    colorId: 1
   - x: 9
     y: 4
     colorId: 0
@@ -171,28 +171,28 @@ MonoBehaviour:
     colorId: 0
   - x: 1
     y: 5
-    colorId: 16
+    colorId: 1
   - x: 2
     y: 5
-    colorId: 16
+    colorId: 0
   - x: 3
     y: 5
-    colorId: 17
+    colorId: 1
   - x: 4
     y: 5
-    colorId: 17
+    colorId: 0
   - x: 5
     y: 5
-    colorId: 16
+    colorId: 1
   - x: 6
     y: 5
-    colorId: 16
+    colorId: 0
   - x: 7
     y: 5
-    colorId: 15
+    colorId: 0
   - x: 8
     y: 5
-    colorId: 0
+    colorId: 1
   - x: 9
     y: 5
     colorId: 0
@@ -201,25 +201,25 @@ MonoBehaviour:
     colorId: 0
   - x: 1
     y: 6
-    colorId: 16
+    colorId: 1
   - x: 2
     y: 6
-    colorId: 17
+    colorId: 1
   - x: 3
     y: 6
-    colorId: 16
+    colorId: 1
   - x: 4
     y: 6
-    colorId: 17
+    colorId: 1
   - x: 5
     y: 6
-    colorId: 16
+    colorId: 1
   - x: 6
     y: 6
-    colorId: 16
+    colorId: 0
   - x: 7
     y: 6
-    colorId: 15
+    colorId: 1
   - x: 8
     y: 6
     colorId: 0
@@ -231,25 +231,25 @@ MonoBehaviour:
     colorId: 0
   - x: 1
     y: 7
-    colorId: 0
+    colorId: 1
   - x: 2
     y: 7
-    colorId: 16
+    colorId: 0
   - x: 3
     y: 7
-    colorId: 16
+    colorId: 0
   - x: 4
     y: 7
     colorId: 0
   - x: 5
     y: 7
-    colorId: 16
+    colorId: 1
   - x: 6
     y: 7
-    colorId: 16
+    colorId: 0
   - x: 7
     y: 7
-    colorId: 0
+    colorId: 1
   - x: 8
     y: 7
     colorId: 0
@@ -282,7 +282,7 @@ MonoBehaviour:
     colorId: 0
   - x: 8
     y: 8
-    colorId: 0
+    colorId: 1
   - x: 9
     y: 8
     colorId: 0
