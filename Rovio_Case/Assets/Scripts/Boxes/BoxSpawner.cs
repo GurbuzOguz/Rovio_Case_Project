@@ -24,6 +24,7 @@ public class BoxSpawner : MonoBehaviour
     private IBoxFactory _boxFactory;
     private IBoxQueueService _queueService;
     private IBoxSpawnPolicy _spawnPolicy;
+    private int _customSpawnOrderCursor;
 
     public IReadOnlyList<BoxController> ActiveBoxes => _activeBoxes;
 
@@ -89,6 +90,7 @@ public class BoxSpawner : MonoBehaviour
 
         _activeBoxes.Clear();
         _runtimeGeneratedConfigs.Clear();
+        _customSpawnOrderCursor = 0;
 
         int maxByConfig = _levelLayout.initialBoxConfigs.Count;
         int maxBySpawnPoints = spawnPoints.Count;
@@ -221,9 +223,7 @@ public class BoxSpawner : MonoBehaviour
             return;
         }
 
-        int chosenColorId = _spawnPolicy != null
-            ? _spawnPolicy.ChooseNextColorIdToSpawn(remaining, _knownBoxes)
-            : -1;
+        int chosenColorId = ChooseNextRuntimeColorId(remaining);
         if (chosenColorId < 0)
         {
             return;
@@ -325,7 +325,7 @@ public class BoxSpawner : MonoBehaviour
         return cfg;
     }
 
-    private static int ChooseNextInitialColorId(
+    private static int ChooseNextInitialColorIdByNeed(
         IReadOnlyDictionary<int, int> remainingByColor,
         Dictionary<int, int> plannedCoverageByColor,
         int seed)
@@ -370,6 +370,89 @@ public class BoxSpawner : MonoBehaviour
         candidates.Sort();
         int idx = Mathf.Abs(seed) % candidates.Count;
         return candidates[idx];
+    }
+
+    private int ChooseNextInitialColorId(
+        IReadOnlyDictionary<int, int> remainingByColor,
+        Dictionary<int, int> plannedCoverageByColor,
+        int seed)
+    {
+        bool hasCustomOrder = _levelLayout != null &&
+                              _levelLayout.customBoxSpawnColorOrder != null &&
+                              _levelLayout.customBoxSpawnColorOrder.Count > 0;
+
+        if (hasCustomOrder)
+        {
+            // Custom order is authoritative when provided.
+            return ChooseFromCustomOrderForInitial(remainingByColor, plannedCoverageByColor);
+        }
+
+        return ChooseNextInitialColorIdByNeed(remainingByColor, plannedCoverageByColor, seed);
+    }
+
+    private int ChooseNextRuntimeColorId(IReadOnlyDictionary<int, int> remainingByColor)
+    {
+        bool hasCustomOrder = _levelLayout != null &&
+                              _levelLayout.customBoxSpawnColorOrder != null &&
+                              _levelLayout.customBoxSpawnColorOrder.Count > 0;
+
+        if (hasCustomOrder)
+        {
+            // Custom order is authoritative when provided.
+            return ChooseFromCustomOrderForRuntime(remainingByColor);
+        }
+
+        return _spawnPolicy != null
+            ? _spawnPolicy.ChooseNextColorIdToSpawn(remainingByColor, _knownBoxes)
+            : -1;
+    }
+
+    private int ChooseFromCustomOrderForInitial(
+        IReadOnlyDictionary<int, int> remainingByColor,
+        Dictionary<int, int> plannedCoverageByColor)
+    {
+        var order = _levelLayout != null ? _levelLayout.customBoxSpawnColorOrder : null;
+        if (order == null || order.Count == 0)
+        {
+            return -1;
+        }
+
+        int attempts = order.Count;
+        for (int i = 0; i < attempts; i++)
+        {
+            int idx = (_customSpawnOrderCursor + i) % order.Count;
+            int colorId = order[idx];
+            if (GetUncoveredNeedForInitialPlan(colorId, remainingByColor, plannedCoverageByColor) > 0)
+            {
+                _customSpawnOrderCursor = (idx + 1) % order.Count;
+                return colorId;
+            }
+        }
+
+        return -1;
+    }
+
+    private int ChooseFromCustomOrderForRuntime(IReadOnlyDictionary<int, int> remainingByColor)
+    {
+        var order = _levelLayout != null ? _levelLayout.customBoxSpawnColorOrder : null;
+        if (order == null || order.Count == 0)
+        {
+            return -1;
+        }
+
+        int attempts = order.Count;
+        for (int i = 0; i < attempts; i++)
+        {
+            int idx = (_customSpawnOrderCursor + i) % order.Count;
+            int colorId = order[idx];
+            if (GetUncoveredNeedForColor(colorId, remainingByColor) > 0)
+            {
+                _customSpawnOrderCursor = (idx + 1) % order.Count;
+                return colorId;
+            }
+        }
+
+        return -1;
     }
 
     private static int GetUncoveredNeedForInitialPlan(

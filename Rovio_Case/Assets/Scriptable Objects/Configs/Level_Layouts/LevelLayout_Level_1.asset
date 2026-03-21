@@ -103,3 +103,4 @@ MonoBehaviour:
   benchCapacity: 5
   initialBoxCount: 9
   initialBoxConfigs: []
+  customBoxSpawnColorOrder: 000000000100000002000000000000000100000002000000010000000200000000000000

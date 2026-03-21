@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProductPalette
   entries:
   - colorId: 0
-    displayColor: {r: 0.9951812, g: 1, b: 0.33018857, a: 1}
+    displayColor: {r: 0.32941175, g: 0.65651745, b: 1, a: 1}
   - colorId: 1
     displayColor: {r: 0.0911143, g: 0.7433963, b: 0, a: 1}
   - colorId: 2

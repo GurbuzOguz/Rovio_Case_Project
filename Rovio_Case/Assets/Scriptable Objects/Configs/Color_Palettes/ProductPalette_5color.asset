@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProductPalette
   entries:
   - colorId: 0
-    displayColor: {r: 0.73929566, g: 0.85660374, b: 0.3087006, a: 1}
+    displayColor: {r: 0.8490566, g: 0.1778213, b: 0.7445618, a: 1}
   - colorId: 1
-    displayColor: {r: 0.90943396, g: 0.70187175, b: 0.12869336, a: 0.9843137}
+    displayColor: {r: 0.12941174, g: 0.86844426, b: 0.9098039, a: 0.9843137}
   - colorId: 2
-    displayColor: {r: 0.0911143, g: 0.7433963, b: 0, a: 1}
+    displayColor: {r: 0.06166838, g: 0.509434, b: 0, a: 1}
   - colorId: 3
     displayColor: {r: 0.735849, g: 0, b: 0, a: 1}
   - colorId: 4

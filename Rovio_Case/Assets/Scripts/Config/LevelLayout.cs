@@ -27,6 +27,9 @@ public class LevelLayout : ScriptableObject
     [Header("Boxes")]
     [Tooltip("BoxConfigs used at level start. Mapped by scene spawn point order.")]
     public List<BoxConfig> initialBoxConfigs = new List<BoxConfig>();
+
+    [Tooltip("Optional box color spawn order (colorId sequence). If empty, default spawn logic is used.")]
+    public List<int> customBoxSpawnColorOrder = new List<int>();
 }
 
 
