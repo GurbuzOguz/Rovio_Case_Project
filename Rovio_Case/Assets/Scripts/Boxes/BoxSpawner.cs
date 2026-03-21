@@ -27,6 +27,24 @@ public class BoxSpawner : MonoBehaviour
 
     public IReadOnlyList<BoxController> ActiveBoxes => _activeBoxes;
 
+    public bool IsFrontRowBox(BoxController box)
+    {
+        if (box == null)
+        {
+            return false;
+        }
+
+        EnsureActiveBoxesSize();
+        int idx = _activeBoxes.IndexOf(box);
+        if (idx < 0)
+        {
+            return false;
+        }
+
+        int frontRowCount = Mathf.Max(1, queueRowSize);
+        return idx < frontRowCount;
+    }
+
     [Inject]
     public void Construct(LevelLayout levelLayout, GridConfig gridConfig, IGridService gridService, DiContainer container, ISfxService sfxService)
     {
@@ -81,10 +99,37 @@ public class BoxSpawner : MonoBehaviour
             return;
         }
 
+        var remaining = _gridService != null
+            ? _gridService.GetRemainingCountsByColorId()
+            : null;
+        var plannedCoverageByColor = new Dictionary<int, int>();
+
+        int nextSlotIndex = 0;
         for (int i = 0; i < maxBoxes; i++)
         {
-            SpawnBoxAtSlot(i, GetOrCreateConfigForIndex(i, _levelLayout));
+            var baseConfig = GetOrCreateConfigForIndex(i, _levelLayout);
+            int chosenColorId = ChooseNextInitialColorId(remaining, plannedCoverageByColor, i);
+            if (chosenColorId < 0)
+            {
+                break;
+            }
+
+            var spawnConfig = BuildInitialSpawnConfig(chosenColorId, baseConfig, remaining, plannedCoverageByColor, i);
+            if (spawnConfig == null)
+            {
+                continue;
+            }
+
+            if (nextSlotIndex >= spawnPoints.Count)
+            {
+                break;
+            }
+
+            // Keep the queue compact by filling slots from front to back.
+            SpawnBoxAtSlot(nextSlotIndex, spawnConfig);
+            nextSlotIndex++;
         }
+
     }
 
     private void SpawnBoxAtSlot(int slotIndex, BoxConfig config)
@@ -186,7 +231,9 @@ public class BoxSpawner : MonoBehaviour
 
         var cfg = ScriptableObject.CreateInstance<BoxConfig>();
         cfg.colorId = chosenColorId;
-        cfg.capacity = Mathf.Max(1, defaultBoxCapacity);
+        int remainingForChosenColor = GetUncoveredNeedForColor(chosenColorId, remaining);
+        int maxCapacity = Mathf.Max(1, defaultBoxCapacity);
+        cfg.capacity = Mathf.Clamp(remainingForChosenColor, 1, maxCapacity);
         cfg.moveSpeed = Mathf.Max(0.1f, defaultBoxMoveSpeed);
         cfg.name = $"RuntimeBoxConfig_{chosenColorId}_{System.Guid.NewGuid()}";
         _runtimeGeneratedConfigs.Add(cfg);
@@ -242,6 +289,125 @@ public class BoxSpawner : MonoBehaviour
 
         int i = index % palette.entries.Count;
         return palette.entries[i].colorId;
+    }
+
+    private BoxConfig BuildInitialSpawnConfig(
+        int chosenColorId,
+        BoxConfig baseConfig,
+        IReadOnlyDictionary<int, int> remainingByColor,
+        Dictionary<int, int> plannedCoverageByColor,
+        int slotIndex)
+    {
+        if (baseConfig == null)
+        {
+            return null;
+        }
+
+        int colorId = chosenColorId;
+        int baseCapacity = Mathf.Max(1, baseConfig.capacity);
+        int uncoveredNeed = GetUncoveredNeedForInitialPlan(colorId, remainingByColor, plannedCoverageByColor);
+        if (uncoveredNeed <= 0)
+        {
+            return null;
+        }
+
+        int capacity = Mathf.Min(baseCapacity, uncoveredNeed);
+        plannedCoverageByColor[colorId] = plannedCoverageByColor.TryGetValue(colorId, out int covered)
+            ? covered + capacity
+            : capacity;
+
+        var cfg = ScriptableObject.CreateInstance<BoxConfig>();
+        cfg.colorId = colorId;
+        cfg.capacity = capacity;
+        cfg.moveSpeed = Mathf.Max(0.1f, baseConfig.moveSpeed > 0f ? baseConfig.moveSpeed : defaultBoxMoveSpeed);
+        cfg.name = $"InitialRuntimeBoxConfig_{colorId}_{slotIndex}";
+        _runtimeGeneratedConfigs.Add(cfg);
+        return cfg;
+    }
+
+    private static int ChooseNextInitialColorId(
+        IReadOnlyDictionary<int, int> remainingByColor,
+        Dictionary<int, int> plannedCoverageByColor,
+        int seed)
+    {
+        if (remainingByColor == null || remainingByColor.Count == 0)
+        {
+            return -1;
+        }
+
+        int bestNeed = 0;
+        var candidates = new List<int>();
+
+        foreach (var kv in remainingByColor)
+        {
+            int colorId = kv.Key;
+            int planned = plannedCoverageByColor != null && plannedCoverageByColor.TryGetValue(colorId, out int covered)
+                ? covered
+                : 0;
+            int need = Mathf.Max(0, kv.Value - planned);
+            if (need <= 0)
+            {
+                continue;
+            }
+
+            if (need > bestNeed)
+            {
+                bestNeed = need;
+                candidates.Clear();
+                candidates.Add(colorId);
+            }
+            else if (need == bestNeed)
+            {
+                candidates.Add(colorId);
+            }
+        }
+
+        if (candidates.Count == 0)
+        {
+            return -1;
+        }
+
+        candidates.Sort();
+        int idx = Mathf.Abs(seed) % candidates.Count;
+        return candidates[idx];
+    }
+
+    private static int GetUncoveredNeedForInitialPlan(
+        int colorId,
+        IReadOnlyDictionary<int, int> remainingByColor,
+        Dictionary<int, int> plannedCoverageByColor)
+    {
+        if (remainingByColor == null || !remainingByColor.TryGetValue(colorId, out int remainingCount))
+        {
+            return 0;
+        }
+
+        int planned = plannedCoverageByColor != null && plannedCoverageByColor.TryGetValue(colorId, out int covered)
+            ? covered
+            : 0;
+
+        return Mathf.Max(0, remainingCount - planned);
+    }
+
+    private int GetUncoveredNeedForColor(int colorId, IReadOnlyDictionary<int, int> remainingByColor)
+    {
+        if (remainingByColor == null || !remainingByColor.TryGetValue(colorId, out int remainingCount))
+        {
+            return 0;
+        }
+
+        int capacityCoverage = 0;
+        foreach (var box in _knownBoxes)
+        {
+            if (box == null || !box.gameObject.activeInHierarchy || box.ColorId != colorId)
+            {
+                continue;
+            }
+
+            capacityCoverage += Mathf.Max(0, box.Capacity - box.CurrentLoad);
+        }
+
+        return Mathf.Max(0, remainingCount - capacityCoverage);
     }
 }
 

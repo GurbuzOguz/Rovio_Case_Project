@@ -5,14 +5,10 @@ public interface IBenchService
     int Capacity { get; }
     int OccupiedCount { get; }
 
-    /// <summary>
-    /// Reserves an available bench slot. Returns false if none is available.
-    /// </summary>
+    // Reserves an available bench slot. Returns false if none is available.
     bool TryReserveSlot(out Transform slot);
 
-    /// <summary>
-    /// Releases a previously reserved slot.
-    /// </summary>
+    // Releases a previously reserved slot.
     void ReleaseSlot(Transform slot);
 }
 

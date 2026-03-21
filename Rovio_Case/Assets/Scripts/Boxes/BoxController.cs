@@ -160,7 +160,8 @@ public class BoxController : MonoBehaviour, IBox
             return;
         }
 
-        if (_collectModule == null || IsFull)
+        int capacity = Mathf.Max(0, Capacity);
+        if (_collectModule == null || capacity <= 0 || _currentLoad >= capacity)
         {
             return;
         }
@@ -171,11 +172,11 @@ public class BoxController : MonoBehaviour, IBox
             _productViewService,
             boxConfig,
             transform,
-            IsFull,
+            _currentLoad >= capacity,
             out Vector3 cellWorld))
         {
             _feedbackModule?.PlayCollectFeedback(_sfxService, _hapticService, _particleService, cellWorld);
-            _currentLoad++;
+            _currentLoad = Mathf.Min(capacity, _currentLoad + 1);
 
             if (ShouldDeactivateBecauseColorDepleted())
             {
@@ -183,7 +184,7 @@ public class BoxController : MonoBehaviour, IBox
                 return;
             }
 
-            if (IsFull)
+            if (_currentLoad >= capacity)
             {
                 OnBoxFull();
             }

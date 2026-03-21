@@ -201,7 +201,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6738593005558391003}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff2aaff83ee43ff4a80d48ede3c2e1d6, type: 3}
   m_Name: 
@@ -215,4 +215,4 @@ MonoBehaviour:
   outlineWidth: 0.2
   sortingOrder: 500
   bounceDuration: 0.16
-  bounceStrength: 2
+  bounceStrength: 1.5

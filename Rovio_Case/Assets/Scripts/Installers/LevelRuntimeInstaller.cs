@@ -1,10 +1,8 @@
 using UnityEngine;
 using Zenject;
 
-/// <summary>
-/// Scene-based alternative to ScriptableObject installers.
-/// Binds LevelLayout/GridConfig/IGridService for the currently selected level index.
-/// </summary>
+// Scene-based alternative to ScriptableObject installers.
+// Binds LevelLayout/GridConfig/IGridService for the currently selected level index.
 public class LevelRuntimeInstaller : MonoInstaller
 {
     [Header("Sequence (optional)")]

@@ -8,6 +8,7 @@ public class BoxClickHandler : MonoBehaviour
 
     private Camera _camera;
     private IGameStateService _gameState;
+    private BoxSpawner _boxSpawner;
 
     [Inject]
     public void Construct([InjectOptional] IGameStateService gameState)
@@ -18,6 +19,7 @@ public class BoxClickHandler : MonoBehaviour
     private void Awake()
     {
         _camera = Camera.main;
+        _boxSpawner = FindFirstObjectByType<BoxSpawner>();
     }
 
     private void Update()
@@ -45,6 +47,12 @@ public class BoxClickHandler : MonoBehaviour
         Ray ray = _camera.ScreenPointToRay(screenPos);
         if (TryGetClickedBox(ray, out BoxController box))
         {
+            bool isQueueBox = box.State == BoxState.Idle;
+            if (isQueueBox && _boxSpawner != null && !_boxSpawner.IsFrontRowBox(box))
+            {
+                return;
+            }
+
             box.OnClickedByInput();
         }
 #endif

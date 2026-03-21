@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Simple path definition using local-space waypoints.
-/// Box follows the path by adding these local points to path world origin.
-/// </summary>
+// Simple path definition using local-space waypoints.
+// Box follows the path by adding these local points to path world origin.
 public class BoxPath : MonoBehaviour
 {
     [SerializeField] private List<Vector3> localWaypoints = new List<Vector3>();

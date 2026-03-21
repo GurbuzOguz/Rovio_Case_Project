@@ -1,10 +1,8 @@
 using DG.Tweening;
 using UnityEngine;
 
-/// <summary>
-/// Sets initial DOTween capacities.
-/// Can be added to any scene GameObject (preferably a persistent bootstrap object).
-/// </summary>
+// Sets initial DOTween capacities.
+// Can be added to any scene GameObject (preferably a persistent bootstrap object).
 public class DotweenBootstrap : MonoBehaviour
 {
     [Header("Tweens Capacity")]
