@@ -1,3 +1,7 @@
+
+
+https://github.com/user-attachments/assets/9baed9f0-a8d9-4869-ab34-0defbca7a5a3
+
 <img width="472" height="824" alt="gif" src="https://github.com/user-attachments/assets/47812188-090a-47dc-99f6-db644ade473f" />
 <img width="472" height="824" alt="gif" src="https://github.com/user-attachments/assets/cc081b38-e111-445c-bb6b-70825c0e9803" />
 # Rovio Case Project
@@ -68,7 +72,7 @@ Projede Zenject, DOTween, Feel ve benzeri üçüncü taraf paket / varlıklar ku
 
 ## Oyun görüntüleri
 
-<img width="472" height="824" alt="gif" src="https://github.com/user-attachments/assets/d56c1bfb-04b8-41a2-af03-a43aa168880e" />
+[<img width="472" height="400" alt="gif" src="https://github.com/user-attachments/assets/d56c1bfb-04b8-41a2-af03-a43aa168880e" />](https://drive.google.com/file/d/1beQ9NYg1J972RlzxP1Utz6itc34rjH2t/view?usp=sharing)
 
 
 <table>
