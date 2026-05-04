@@ -1,62 +1,65 @@
 # Rovio Case Project
 
-Unity ile geliştirilen, renk bazli kutularla grid uzerindeki urunleri toplama odakli bir puzzle/prototip oyun projesi.
+Unity ile geliştirilen, renk bazlı kutularla ızgaradaki ürünleri toplamaya odaklı bir bulmaca / prototip oyun projesi.
 
-## Proje Ozeti
+## Proje özeti
 
-- Ana sahne: `Assets/Scenes/Game.unity`
-- Oyun dongusu: kutu sec -> rota uzerinde hareket -> uygun renkte urunleri topla -> grid kaydirma uygula -> tum urunler bitince level tamamla
-- Level akisi `PlayerPrefs` uzerinden tutulur ve level tamamlandiginda bir sonraki levele gecilir
-- Mimari Zenject tabanli servis baglamalari ile kuruludur
+- **Konum:** Unity projesi `Rovio_Case` klasöründedir.
+- **Ana sahne:** `Assets/Scenes/Game.unity`
+- **Oyun akışı:** kutu seç → rota üzerinde hareket → aynı renkteki ürünleri topla → ızgara kaydırma → tüm ürünler bittiğinde bölüm tamamlandı
+- **Bölüm ilerlemesi:** `PlayerPrefs` ile tutulur; bölüm bitince sıradaki seviyeye geçilebilir
+- **Mimari:** Zenject ile servis bağımlılık enjeksiyonu
 
-## Teknik Bilgiler
+## Teknik bilgiler
 
-- Unity Editor surumu: `6000.3.2f1`
-- Render Pipeline: URP (`com.unity.render-pipelines.universal`)
-- Input: Unity Input System (`com.unity.inputsystem`)
-- DI: Zenject
-- Tween/animasyon yardimcilari: DOTween
-- UI: TextMeshPro + UGUI
+| Alan | Değer |
+| --- | --- |
+| Unity Editor | `6000.3.2f1` |
+| Render | URP (`com.unity.render-pipelines.universal`) |
+| Giriş | Unity Input System (`com.unity.inputsystem`) |
+| DI | Zenject |
+| Animasyon | DOTween |
+| Arayüz | TextMeshPro + uGUI |
 
-## Nasil Calistirilir
+## Nasıl çalıştırılır
 
-1. Unity Hub uzerinden `Rovio_Case` klasorunu acin.
-2. Unity Editor olarak `6000.3.2f1` (veya uyumlu bir 6000.3.x) surumunu secin.
-3. `Assets/Scenes/Game.unity` sahnesini acin.
-4. Play tusuna basin.
+1. Unity Hub ile `Rovio_Case` klasörünü proje olarak açın.
+2. Editor sürümü olarak `6000.3.2f1` (veya uyumlu `6000.3.x`) seçin.
+3. `Assets/Scenes/Game.unity` sahnesini açın.
+4. **Play** tuşuna basın.
 
-## Oynanis Kurali (Kisa)
+## Oynanış (kısa)
 
-- Kutular tiklanarak aktive edilir.
-- Kutu, path uzerinde ilerlerken kendi rengine uygun urunleri toplar.
-- Toplanan hucreden sonra ilgili satir/sutunda kaydirma uygulanir.
-- Kutu kapasitesi dolarsa kutu devre disi kalir.
-- Bench dolulugu gibi durumlar level fail durumuna gidebilir.
-- Gridde urun kalmadiginda level complete durumu tetiklenir.
+- Kutular **tıklanarak** harekete geçer; kuyrukta yalnızca ön sıradaki kutular seçilebilir.
+- Kutu, yol üzerinde ilerlerken yalnızca **kendi rengine** uyan ürünleri toplar.
+- Ürün alındıktan sonra ilgili satır veya sütunda **kaydırma** uygulanır.
+- Kutu **kapasitesi dolunca** kutu devre dışı kalır.
+- Tezgah (**bench**) doluluğu gibi durumlarda **bölüm başarısız** olabilir.
+- Izgarada ürün kalmadığında **bölüm tamamlandı** durumu tetiklenir.
 
-## Proje Yapisi
+## Klasör yapısı (özet)
 
-- `Rovio_Case/Assets/Scripts/Game`: state ve level flow servisleri
-- `Rovio_Case/Assets/Scripts/Boxes`: box spawn, queue, movement, collect ve bench modulleri
-- `Rovio_Case/Assets/Scripts/Services`: grid data/shift mantigi
-- `Rovio_Case/Assets/Scripts/Products`: urun etkileşim ve gorsel akis
-- `Rovio_Case/Assets/Scripts/UI`: HUD ve level end ekrani yonetimi
-- `Rovio_Case/Assets/Scripts/Installers`: Zenject binding kurulumlari
-- `Rovio_Case/Assets/Scripts/Editor`: level uretim ve hizli test editor araclari
+| Yol | İçerik |
+| --- | --- |
+| `Rovio_Case/Assets/Scripts/Game` | Oyun ve bölüm akışı, durum yönetimi |
+| `Rovio_Case/Assets/Scripts/Boxes` | Kutu üretimi, kuyruk, hareket, toplama, tezgah (bench) |
+| `Rovio_Case/Assets/Scripts/Services` | Izgarada veri ve kaydırma mantığı |
+| `Rovio_Case/Assets/Scripts/Products` | Ürün etkileşimi ve görsel akış |
+| `Rovio_Case/Assets/Scripts/UI` | HUD ve bitiş ekranı |
+| `Rovio_Case/Assets/Scripts/Installers` | Zenject bağlamaları |
+| `Rovio_Case/Assets/Scripts/Editor` | Bölüm araçları ve hızlı test pencereleri |
 
-## Editor Araclari
+## Editör araçları
 
-- `Tools/Level/Pixel Level Editor`:
-  - texture'dan `LevelLayout` urun hucrelerini ve palette olusturma
-- `Tools/Level/Level Quick Start`:
-  - level index secip hizli baslatma / test
+- **Tools → Level → Pixel Level Editor:** Doku üzerinden `LevelLayout` ürün hücreleri ve palet oluşturma (doku için Read/Write önerilir).
+- **Tools → Level → Level Quick Start:** `LevelSequenceConfig` ile bölüm indeksi seçip hızlı oynatma / test.
 
-## Gelistirme Notlari
+## Geliştirme notları
 
-- Build ayarlarinda aktif oyun sahnesi: `Assets/Scenes/Game.unity`
-- Level siralamasi `LevelSequenceConfig` ile yonetilir
-- Aktif level index anahtari: `LevelPrefsKeys.CurrentLevelIndex`
+- Derleme listesindeki oyun sahnesi: `Assets/Scenes/Game.unity`
+- Bölüm sırası: `LevelSequenceConfig` ScriptableObject
+- Aktif bölüm indeksi anahtarı: `LevelPrefsKeys.CurrentLevelIndex`
 
-## Lisans ve Ucuncu Parti
+## Lisans ve üçüncü taraflar
 
-Projede cesitli ucuncu parti Unity paketleri/assetleri kullanilmistir (Zenject, DOTween, Feel vb.). Lisans detaylari ilgili paket klasorlerindeki dokumanlarda bulunur.
+Projede Zenject, DOTween, Feel ve benzeri üçüncü taraf paket / varlıklar kullanılmıştır. Lisans metinleri ilgili paket klasörlerindeki dosyalarda yer alır.
