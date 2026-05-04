@@ -70,9 +70,9 @@ Statik ekran görüntüsü (ör. Level 9/10, pixel sanat):
 
 ![Oyun içi — pixel sanat seviyesi (Level 9/10)](docs/screenshots/gameplay.png)
 
-Kısa oynanış kaydı (Level 9; dışa aktarılan dosya **JPEG** — animasyonlu göstermek için aynı kaydı gerçek **GIF** veya **MP4** olarak da ekleyebilirsiniz):
+Kısa oynanış (video):
 
-![Oynanış — Level 9 (kısa klip)](docs/screenshots/gameplay-demo.jpg)
+<video src="docs/videos/gameplay-demo.mp4" controls playsinline width="100%"></video>
 
 Ekran görüntüsü — son bölüm (Level 10/10, tilki pixel sanatı):
 
