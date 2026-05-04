@@ -2,10 +2,6 @@
 
 Unity ile geliştirilen, renk bazlı kutularla ızgaradaki ürünleri toplamaya odaklı bir bulmaca / prototip oyun projesi.
 
-## Ekran görüntüsü
-
-![Oyun içi görünüm — pixel sanat seviyesi (ör. Level 9/10)](docs/screenshots/gameplay.png)
-
 ## Proje özeti
 
 - **Konum:** Unity projesi `Rovio_Case` klasöründedir.
@@ -67,3 +63,17 @@ Unity ile geliştirilen, renk bazlı kutularla ızgaradaki ürünleri toplamaya 
 ## Lisans ve üçüncü taraflar
 
 Projede Zenject, DOTween, Feel ve benzeri üçüncü taraf paket / varlıklar kullanılmıştır. Lisans metinleri ilgili paket klasörlerindeki dosyalarda yer alır.
+
+## Oyun görüntüleri
+
+Statik ekran görüntüsü (ör. Level 9/10, pixel sanat):
+
+![Oyun içi — pixel sanat seviyesi (Level 9/10)](docs/screenshots/gameplay.png)
+
+Kısa oynanış kaydı (Level 9; dışa aktarılan dosya **JPEG** — animasyonlu göstermek için aynı kaydı gerçek **GIF** veya **MP4** olarak da ekleyebilirsiniz):
+
+![Oynanış — Level 9 (kısa klip)](docs/screenshots/gameplay-demo.jpg)
+
+Ekran görüntüsü — son bölüm (Level 10/10, tilki pixel sanatı):
+
+![Oyun içi — Level 10/10, tilki seviyesi](docs/screenshots/level10-fox.png)
