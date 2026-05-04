@@ -66,17 +66,19 @@ Projede Zenject, DOTween, Feel ve benzeri üçüncü taraf paket / varlıklar ku
 
 ## Oyun görüntüleri
 
-<video controls playsinline width="100%">
-  <source src="./docs/videos/gameplay-demo.mp4" type="video/mp4">
-</video>
+<p align="center">
+  <video controls playsinline height="400">
+    <source src="https://raw.githubusercontent.com/GurbuzOguz/Rovio_Case_Project/main/docs/videos/gameplay-demo.mp4" type="video/mp4">
+  </video>
+</p>
 
 <p align="center">
-  <img src="docs/screenshots/gameplay-demo.gif" alt="Kısa oynanış (GIF)" width="480">
+  <img src="https://raw.githubusercontent.com/GurbuzOguz/Rovio_Case_Project/main/docs/screenshots/gameplay-demo.gif" alt="Kısa oynanış (GIF)" height="400">
 </p>
 
 <table>
   <tr>
-    <td align="center" width="50%"><img src="docs/screenshots/gameplay.png" alt="Level 9/10" width="340"></td>
-    <td align="center" width="50%"><img src="docs/screenshots/level10-fox.png" alt="Level 10/10" width="340"></td>
+    <td align="center" valign="middle"><img src="https://raw.githubusercontent.com/GurbuzOguz/Rovio_Case_Project/main/docs/screenshots/gameplay.png" alt="Level 9/10" height="400"></td>
+    <td align="center" valign="middle"><img src="https://raw.githubusercontent.com/GurbuzOguz/Rovio_Case_Project/main/docs/screenshots/level10-fox.png" alt="Level 10/10" height="400"></td>
   </tr>
 </table>
