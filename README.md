@@ -70,8 +70,12 @@ Projede Zenject, DOTween, Feel ve benzeri üçüncü taraf paket / varlıklar ku
   <source src="./docs/videos/gameplay-demo.mp4" type="video/mp4">
 </video>
 
-![Kısa oynanış](docs/screenshots/gameplay-demo.gif)
+<p align="center">
+  <img src="docs/screenshots/gameplay-demo.gif" alt="Kısa oynanış (GIF)" width="480">
+</p>
 
-![Oyun içi — Level 9/10](docs/screenshots/gameplay.png)
-
-![Oyun içi — Level 10/10](docs/screenshots/level10-fox.png)
+<p align="center">
+  <img src="docs/screenshots/gameplay.png" alt="Level 9/10" width="340">
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/level10-fox.png" alt="Level 10/10" width="340">
+</p>
