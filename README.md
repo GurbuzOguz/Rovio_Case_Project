@@ -2,6 +2,10 @@
 
 Unity ile geliştirilen, renk bazlı kutularla ızgaradaki ürünleri toplamaya odaklı bir bulmaca / prototip oyun projesi.
 
+## Ekran görüntüsü
+
+![Oyun içi görünüm — pixel sanat seviyesi (ör. Level 9/10)](docs/screenshots/gameplay.png)
+
 ## Proje özeti
 
 - **Konum:** Unity projesi `Rovio_Case` klasöründedir.
