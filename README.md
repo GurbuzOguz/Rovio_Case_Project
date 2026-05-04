@@ -72,9 +72,6 @@ Projede Zenject, DOTween, Feel ve benzeri üçüncü taraf paket / varlıklar ku
 
 ## Oyun görüntüleri
 
-[<img width="472" height="400" alt="gif" src="https://github.com/user-attachments/assets/d56c1bfb-04b8-41a2-af03-a43aa168880e" />](https://drive.google.com/file/d/1beQ9NYg1J972RlzxP1Utz6itc34rjH2t/view?usp=sharing)
-
-
 <table>
   <tr>
     <td align="center" valign="middle"><img src="https://raw.githubusercontent.com/GurbuzOguz/Rovio_Case_Project/main/docs/screenshots/gameplay.png" alt="Level 9/10" height="400"></td>
