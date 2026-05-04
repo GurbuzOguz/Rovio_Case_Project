@@ -1,3 +1,5 @@
+<img width="472" height="824" alt="gif" src="https://github.com/user-attachments/assets/47812188-090a-47dc-99f6-db644ade473f" />
+<img width="472" height="824" alt="gif" src="https://github.com/user-attachments/assets/cc081b38-e111-445c-bb6b-70825c0e9803" />
 # Rovio Case Project
 
 Unity ile geliştirilen, renk bazlı kutularla ızgaradaki ürünleri toplamaya odaklı bir bulmaca / prototip oyun projesi.
@@ -66,15 +68,8 @@ Projede Zenject, DOTween, Feel ve benzeri üçüncü taraf paket / varlıklar ku
 
 ## Oyun görüntüleri
 
-<p align="center">
-  <video controls playsinline height="400">
-    <source src="https://raw.githubusercontent.com/GurbuzOguz/Rovio_Case_Project/main/docs/videos/gameplay-demo.mp4" type="video/mp4">
-  </video>
-</p>
+<img width="472" height="824" alt="gif" src="https://github.com/user-attachments/assets/d56c1bfb-04b8-41a2-af03-a43aa168880e" />
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/GurbuzOguz/Rovio_Case_Project/main/docs/screenshots/gameplay-demo.gif" alt="Kısa oynanış (GIF)" height="400">
-</p>
 
 <table>
   <tr>
