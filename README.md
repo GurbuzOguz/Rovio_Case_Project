@@ -1,9 +1,3 @@
-
-
-https://github.com/user-attachments/assets/9baed9f0-a8d9-4869-ab34-0defbca7a5a3
-
-<img width="472" height="824" alt="gif" src="https://github.com/user-attachments/assets/47812188-090a-47dc-99f6-db644ade473f" />
-<img width="472" height="824" alt="gif" src="https://github.com/user-attachments/assets/cc081b38-e111-445c-bb6b-70825c0e9803" />
 # Rovio Case Project
 
 Unity ile geliştirilen, renk bazlı kutularla ızgaradaki ürünleri toplamaya odaklı bir bulmaca / prototip oyun projesi.
