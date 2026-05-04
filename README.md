@@ -66,14 +66,12 @@ Projede Zenject, DOTween, Feel ve benzeri üçüncü taraf paket / varlıklar ku
 
 ## Oyun görüntüleri
 
-Statik ekran görüntüsü (ör. Level 9/10, pixel sanat):
+<video controls playsinline width="100%">
+  <source src="./docs/videos/gameplay-demo.mp4" type="video/mp4">
+</video>
 
-![Oyun içi — pixel sanat seviyesi (Level 9/10)](docs/screenshots/gameplay.png)
+![Kısa oynanış](docs/screenshots/gameplay-demo.gif)
 
-Kısa oynanış (video):
+![Oyun içi — Level 9/10](docs/screenshots/gameplay.png)
 
-<video src="docs/videos/gameplay-demo.mp4" controls playsinline width="100%"></video>
-
-Ekran görüntüsü — son bölüm (Level 10/10, tilki pixel sanatı):
-
-![Oyun içi — Level 10/10, tilki seviyesi](docs/screenshots/level10-fox.png)
+![Oyun içi — Level 10/10](docs/screenshots/level10-fox.png)
