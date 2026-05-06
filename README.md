@@ -14,7 +14,7 @@ Unity ile geliştirilen, renk bazlı kutularla ızgaradaki ürünleri toplamaya 
 
 | Alan | Değer |
 | --- | --- |
-| Unity Editor | `6000.3.2f1` |
+| Unity Editor | `6000.3.10f1` |
 | Render | URP (`com.unity.render-pipelines.universal`) |
 | Giriş | Unity Input System (`com.unity.inputsystem`) |
 | DI | Zenject |
